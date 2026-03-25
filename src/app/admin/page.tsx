@@ -1,80 +1,118 @@
-import {FileClock, Package, ShoppingBag, Users, Warehouse} from "lucide-react";
-import dbConnect from "@/lib/db/connection";
-import {Brand} from "@/lib/db/models/Brand";
-import {Order} from "@/lib/db/models/Order";
-import {Product} from "@/lib/db/models/Product";
-import {User} from "@/lib/db/models/User";
-import {Warehouse as WarehouseModel} from "@/lib/db/models/Warehouse";
-import {PageHeader} from "@/components/admin/PageHeader";
-import {SectionCard} from "@/components/admin/SectionCard";
-import {StatCard} from "@/components/admin/StatCard";
+import Link from "next/link";
+import {ArrowRight} from "lucide-react";
+import {BrandCatalogCard, BreakdownCard, InsightMetricCard, LeaderboardCard, TrendCard} from "@/components/admin/analytics/InsightBlocks";
+import {buildDashboardInsights} from "@/lib/admin/insights";
+import {loadInsightsData} from "@/lib/admin/load-insights-data";
+
+const money = new Intl.NumberFormat("en-IN", {
+  style: "currency",
+  currency: "INR",
+  maximumFractionDigits: 0,
+});
 
 export default async function AdminDashboardPage() {
-  await dbConnect();
-
-  const [orderCount, productCount, userCount, warehouseCount, brandCount, pendingOrders] =
-    await Promise.all([
-      Order.countDocuments(),
-      Product.countDocuments(),
-      User.countDocuments({roleKey: {$ne: "retailer"}}),
-      WarehouseModel.countDocuments(),
-      Brand.countDocuments(),
-      Order.countDocuments({workflowStatus: {$in: ["submitted", "availability_check", "manager_approval"]}}),
-    ]);
+  const data = await loadInsightsData();
+  const insights = buildDashboardInsights(data);
 
   return (
-    <div className="space-y-8">
-      <PageHeader
-        title="Admin overview"
-        description="Live status for the CallawayOne admin rebuild. This dashboard now reflects Mongo-backed counts across catalog, users, orders, warehouses, and brand structure."
-      />
+    <div className="space-y-4">
+      <section className="premium-card overflow-hidden rounded-[28px]">
+        <div className="flex flex-wrap items-start justify-between gap-4 border-b border-border/60 px-4 py-4">
+          <div className="space-y-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-foreground/42">
+              Daily overview
+            </p>
+            <h2 className="text-[1.85rem] font-semibold tracking-tight text-foreground">
+              Performance at a glance
+            </h2>
+            <p className="max-w-3xl text-sm text-foreground/62">
+              Follow order movement, product readiness, available stock, and team activity from one clear starting point.
+            </p>
+          </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-        <StatCard label="Orders" value={orderCount} hint={`${pendingOrders} pending workflow actions`} icon={ShoppingBag} />
-        <StatCard label="Products" value={productCount} hint={`${brandCount} active brand collections`} icon={Package} />
-        <StatCard label="Admin users" value={userCount} hint="Managers, admins, and sales reps" icon={Users} />
-        <StatCard label="Warehouses" value={warehouseCount} hint="Dynamic inventory locations" icon={Warehouse} />
-        <StatCard label="Pending approvals" value={pendingOrders} hint="Submitted, availability, manager approval" icon={FileClock} />
+          <Link
+            href="/admin/analytics"
+            className="inline-flex items-center gap-2 rounded-2xl border border-border/70 bg-background px-4 py-3 text-sm font-semibold text-foreground/76"
+          >
+            Open analytics
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        <div className="grid gap-4 px-4 py-4 md:grid-cols-2 xl:grid-cols-5">
+          <InsightMetricCard
+            label="Order value"
+            value={money.format(insights.headline.totalRevenue)}
+            detail={`${insights.headline.totalOrders} live orders tracked across the workspace.`}
+            accent="#2f7ff4"
+          />
+          <InsightMetricCard
+            label="Active products"
+            value={String(insights.headline.activeProducts)}
+            detail="Products currently available to sales and admin teams."
+            accent="#606260"
+          />
+          <InsightMetricCard
+            label="Available units"
+            value={String(insights.headline.availableUnits)}
+            detail="Stock ready to allocate across active warehouse locations."
+            accent="#1aa661"
+          />
+          <InsightMetricCard
+            label="Pending approvals"
+            value={String(insights.headline.pendingApprovals)}
+            detail="Orders waiting on availability review or approval."
+            accent="#d4a017"
+          />
+          <InsightMetricCard
+            label="Average order"
+            value={money.format(insights.headline.averageOrderValue)}
+            detail="Average value per active order in the current system."
+            accent="#949797"
+          />
+        </div>
+      </section>
+
+      <div className="grid gap-4 xl:grid-cols-[1.25fr_0.75fr]">
+        <TrendCard
+          title="Weekly order movement"
+          description="Order value and activity across the last eight weeks."
+          points={insights.weeklyOrderValue}
+          formatter={(value) => money.format(value)}
+        />
+        <BreakdownCard
+          title="Workflow focus"
+          description="Where orders are currently sitting in the process."
+          items={insights.workflowBreakdown}
+        />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <SectionCard
-          title="Current implementation status"
-          description="The rebuild now uses Mongo-backed auth and normalized admin entities. The next layers are deeper order editing, attachment workflows, import pipelines, and PDF/catalog generation."
-        >
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-[24px] border border-border/60 bg-background/70 p-5">
-              <h3 className="text-base font-semibold text-foreground">Operational now</h3>
-              <ul className="mt-3 space-y-2 text-sm text-foreground/65">
-                <li>Mongo-backed credentials with RBAC-aware middleware</li>
-                <li>CRUD surfaces for roles, users, brands, warehouses, and products</li>
-                <li>Variant generation and warehouse-level inventory documents</li>
-                <li>Order listing, creation foundation, and workflow transitions</li>
-              </ul>
-            </div>
-            <div className="rounded-[24px] border border-border/60 bg-background/70 p-5">
-              <h3 className="text-base font-semibold text-foreground">Next milestone</h3>
-              <ul className="mt-3 space-y-2 text-sm text-foreground/65">
-                <li>SQL import parity across legacy product and order tables</li>
-                <li>Bulk import/export jobs and attachment management</li>
-                <li>PDF, catalog, and PPT output generation</li>
-                <li>Deeper order edit flows and stock reservation automation</li>
-              </ul>
-            </div>
-          </div>
-        </SectionCard>
+      <div className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
+        <BrandCatalogCard
+          title="Brand coverage"
+          description="Current catalog footprint by brand, including variants and available stock."
+          items={insights.brandCatalog}
+        />
+        <LeaderboardCard
+          title="Top ordered products"
+          description="Most requested items by unit count, with value underneath."
+          items={insights.topProducts}
+          valuePrefix=""
+        />
+      </div>
 
-        <SectionCard
-          title="Suggested next steps"
-          description="Recommended sequence for the next admin delivery wave."
-        >
-          <ol className="space-y-4 text-sm text-foreground/65">
-            <li className="rounded-2xl border border-border/60 bg-background/70 px-4 py-3">1. Stabilize migration data and complete CSV/XLSX import pipelines.</li>
-            <li className="rounded-2xl border border-border/60 bg-background/70 px-4 py-3">2. Finish order editor with variant picking, availability checks, and note history.</li>
-            <li className="rounded-2xl border border-border/60 bg-background/70 px-4 py-3">3. Add file exports, approvals, and attachment-aware PDF generation.</li>
-            <li className="rounded-2xl border border-border/60 bg-background/70 px-4 py-3">4. Extend admin media and catalog tooling before public commerce.</li>
-          </ol>
-        </SectionCard>
+      <div className="grid gap-4 xl:grid-cols-[0.8fr_1.2fr]">
+        <BreakdownCard
+          title="Team distribution"
+          description="Current active users by responsibility."
+          items={insights.roleDistribution}
+        />
+        <LeaderboardCard
+          title="Leading people"
+          description="Team members attached to the highest order value in the system."
+          items={insights.topContributors}
+          valuePrefix=""
+        />
       </div>
     </div>
   );

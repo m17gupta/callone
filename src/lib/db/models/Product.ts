@@ -23,6 +23,8 @@ export interface IProduct extends Document {
   media: {
     primaryImagePath?: string;
     galleryPaths: string[];
+    sharedCollectionKey?: string;
+    variantImageStrategy?: "product_shared" | "variant_override";
   };
   attributeSetId?: string;
   metadata: Record<string, string>;
@@ -69,6 +71,12 @@ const ProductSchema = new Schema<IProduct>(
     media: {
       primaryImagePath: {type: String, default: ""},
       galleryPaths: [{type: String}],
+      sharedCollectionKey: {type: String, default: ""},
+      variantImageStrategy: {
+        type: String,
+        enum: ["product_shared", "variant_override"],
+        default: "product_shared",
+      },
     },
     attributeSetId: {type: String},
     metadata: {type: Map, of: String, default: {}},

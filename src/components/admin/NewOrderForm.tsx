@@ -17,6 +17,12 @@ type NewOrderFormProps = {
   brands: SelectOption[];
   variants: SelectOption[];
   warehouses: SelectOption[];
+  defaults?: {
+    retailerId?: string;
+    managerId?: string;
+    salesRepId?: string;
+    brandId?: string;
+  };
 };
 
 type OrderLine = {
@@ -34,6 +40,7 @@ export function NewOrderForm({
   brands,
   variants,
   warehouses,
+  defaults,
 }: NewOrderFormProps) {
   const [lines, setLines] = useState<OrderLine[]>([
     {variantId: variants[0]?.id ?? "", quantity: 1, warehouseId: warehouses[0]?.id ?? "", lineDiscountValue: 22},
@@ -50,7 +57,12 @@ export function NewOrderForm({
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <label className="block">
           <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-foreground/45">Retailer</span>
-          <select name="retailerId" className="w-full rounded-2xl border border-border/70 bg-background px-4 py-3 text-sm outline-none" required>
+          <select
+            name="retailerId"
+            defaultValue={defaults?.retailerId ?? ""}
+            className="w-full rounded-2xl border border-border/70 bg-background px-4 py-3 text-sm outline-none"
+            required
+          >
             <option value="">Select retailer</option>
             {retailers.map((retailer) => (
               <option key={retailer.id} value={retailer.id}>{retailer.label}</option>
@@ -60,7 +72,11 @@ export function NewOrderForm({
 
         <label className="block">
           <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-foreground/45">Manager</span>
-          <select name="managerId" className="w-full rounded-2xl border border-border/70 bg-background px-4 py-3 text-sm outline-none">
+          <select
+            name="managerId"
+            defaultValue={defaults?.managerId ?? ""}
+            className="w-full rounded-2xl border border-border/70 bg-background px-4 py-3 text-sm outline-none"
+          >
             <option value="">Select manager</option>
             {managers.map((manager) => (
               <option key={manager.id} value={manager.id}>{manager.label}</option>
@@ -70,7 +86,11 @@ export function NewOrderForm({
 
         <label className="block">
           <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-foreground/45">Sales rep</span>
-          <select name="salesRepId" className="w-full rounded-2xl border border-border/70 bg-background px-4 py-3 text-sm outline-none">
+          <select
+            name="salesRepId"
+            defaultValue={defaults?.salesRepId ?? ""}
+            className="w-full rounded-2xl border border-border/70 bg-background px-4 py-3 text-sm outline-none"
+          >
             <option value="">Select sales rep</option>
             {salesReps.map((salesRep) => (
               <option key={salesRep.id} value={salesRep.id}>{salesRep.label}</option>
@@ -80,7 +100,11 @@ export function NewOrderForm({
 
         <label className="block">
           <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-foreground/45">Brand</span>
-          <select name="brandId" className="w-full rounded-2xl border border-border/70 bg-background px-4 py-3 text-sm outline-none">
+          <select
+            name="brandId"
+            defaultValue={defaults?.brandId ?? ""}
+            className="w-full rounded-2xl border border-border/70 bg-background px-4 py-3 text-sm outline-none"
+          >
             <option value="">Any brand</option>
             {brands.map((brand) => (
               <option key={brand.id} value={brand.id}>{brand.label}</option>

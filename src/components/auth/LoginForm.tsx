@@ -48,7 +48,7 @@ export function LoginForm({
               key={preset.email}
               type="button"
               onClick={() => setEmail(preset.email)}
-              className="rounded-[20px] border border-border/60 bg-[color:var(--surface-muted)] px-3 py-3 text-left transition hover:border-primary/25 hover:bg-primary/6"
+              className="rounded-[20px] border border-border/60 bg-[color:var(--surface-muted)] px-3 py-3 text-left transition hover:border-primary/25 hover:bg-primary/10"
             >
               <p className="text-sm font-semibold text-foreground">{preset.label}</p>
               <p className="mt-1 text-xs text-foreground/55">{preset.description}</p>
@@ -111,10 +111,10 @@ export function LoginForm({
       <div className="flex items-center justify-between rounded-[22px] border border-border/60 bg-[color:var(--surface-muted)] px-4 py-3 text-sm text-foreground/58">
         <span className="inline-flex items-center gap-2">
           <Sparkles size={15} className="text-primary" />
-          Premium admin shell with command search
+          Role-based access with a clear sign-in flow
         </span>
         <span className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/45">
-          Next.js + MongoDB
+          Callaway workspace
         </span>
       </div>
 
@@ -124,7 +124,7 @@ export function LoginForm({
         className="inline-flex w-full items-center justify-center gap-2 rounded-[22px] bg-primary px-5 py-3.5 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(36,73,111,0.28)] transition hover:translate-y-[-1px] hover:bg-[color:var(--primary-strong)] disabled:cursor-not-allowed disabled:opacity-60"
       >
         <ShieldCheck size={18} />
-        {isPending ? "Signing in..." : "Sign in to Admin"}
+        {isPending ? "Signing in..." : "Enter workspace"}
         {!isPending ? <ArrowRight size={16} /> : null}
       </button>
     </form>

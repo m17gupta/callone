@@ -1,6 +1,9 @@
+import {cookies} from "next/headers";
 import { AdminShell } from "@/components/layout/AdminShell";
 import {ensureSystemBootstrap} from "@/lib/auth/bootstrap";
+import {ensureWorkspaceSeedData} from "@/lib/auth/seed-workspace";
 import {requireAdminSession} from "@/lib/auth/session";
+import {resolveViewRole} from "@/lib/auth/view-role";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +13,12 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   await ensureSystemBootstrap();
+  await ensureWorkspaceSeedData();
   const session = await requireAdminSession();
+  const viewRole = resolveViewRole(
+    session.user.role,
+    cookies().get("callone-view-role")?.value
+  );
 
   return (
     <AdminShell
@@ -18,6 +26,7 @@ export default async function AdminLayout({
         name: session.user.name,
         email: session.user.email,
         role: session.user.role,
+        viewRole,
       }}
     >
       {children}

@@ -5,6 +5,7 @@
 @layer base {
   :root {
     color-scheme: light;
+    --admin-header-height: 74px;
     --background: #ebebef;
     --foreground: #2c2d2d;
     --surface: #ffffff;
@@ -45,6 +46,7 @@
 
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--admin-header-height) + 16px);
   }
 }
 

@@ -14,9 +14,9 @@ const IMPORT_MODULES = [
   {
     title: "Legacy SQL Migration",
     description:
-      "Script-driven migration from the full MySQL dump into MongoDB collections, preserving order snapshots and stock logic.",
-    href: "/README.md",
-    cta: "Review migration notes",
+      "Bring legacy source data into the current workspace while keeping order history and stock logic intact.",
+    href: "/admin/imports/sheet-calibration",
+    cta: "Use calibration pattern",
     icon: DatabaseZap,
   },
   {
@@ -52,7 +52,7 @@ export default function ImportsPage() {
             </p>
             <ul className="mt-3 space-y-2 text-sm text-foreground/62">
               <li>CSV-based intake and calibration page.</li>
-              <li>Mongo-backed saved datasets and reopen flow.</li>
+              <li>Saved datasets with reopen and export flow.</li>
               <li>Legacy SQL import remains script-first.</li>
             </ul>
           </div>

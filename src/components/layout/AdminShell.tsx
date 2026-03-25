@@ -1,21 +1,35 @@
 'use client';
 
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {usePathname} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 import {signOut} from "next-auth/react";
 import clsx from "clsx";
 import {AnimatePresence, motion} from "framer-motion";
 import {
-  Command,
+  ChevronDown,
+  ChevronRight,
+  Grid2x2,
+  LogOut,
   Menu,
   Moon,
   Search,
+  ShoppingBag,
+  ShoppingCart,
   Sun,
   X,
 } from "lucide-react";
-import {ADMIN_NAV_ITEMS} from "@/lib/admin/command-center";
+import {
+  ADMIN_ACCOUNTS_MENU_ITEMS,
+  ADMIN_COMMAND_ITEMS,
+  ADMIN_NAV_ITEMS,
+  ADMIN_PRODUCTS_MENU_ITEMS,
+  ADMIN_ROUTE_ITEMS,
+  HERO_BANNERS,
+} from "@/lib/admin/command-center";
+import {getAdminBreadcrumbs, getAdminPageMeta} from "@/lib/admin/page-chrome";
+import {getAvailableViewRoles, VIEW_ROLE_LABELS} from "@/lib/auth/view-role";
 import {useTheme} from "../ThemeProvider";
 import {MegaSearch} from "../ui/MegaSearch";
 
@@ -25,51 +39,386 @@ type AdminShellProps = {
     name?: string | null;
     email?: string | null;
     role: string;
+    viewRole: string;
   };
 };
 
-export function AdminShell({ children, user }: AdminShellProps) {
-  const { theme, toggleTheme } = useTheme();
+type HeroSlide = {
+  id: string;
+  image: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+};
+
+function matchesPath(pathname: string, href: string) {
+  if (href === "/admin") {
+    return pathname === "/admin";
+  }
+
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function getSectionItems(id: string, role: string) {
+  if (id === "products") {
+    return ADMIN_PRODUCTS_MENU_ITEMS.filter((item) => !item.roles || item.roles.includes(role));
+  }
+
+  if (id === "accounts") {
+    return ADMIN_ACCOUNTS_MENU_ITEMS.filter((item) => !item.roles || item.roles.includes(role));
+  }
+
+  return [];
+}
+
+function getInitials(name?: string | null) {
+  const parts = (name ?? "")
+    .split(" ")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .slice(0, 2);
+
+  if (!parts.length) {
+    return "CA";
+  }
+
+  return parts.map((part) => part[0]?.toUpperCase() ?? "").join("");
+}
+
+function getHeroImages(
+  pathname: string,
+  activeItem: {heroImage?: string} | undefined
+) {
+  if (pathname.startsWith("/admin/products")) {
+    return [activeItem?.heroImage ?? HERO_BANNERS.iron, HERO_BANNERS.graphite, HERO_BANNERS.orange];
+  }
+
+  if (pathname.startsWith("/admin/orders") || pathname.startsWith("/admin/cart")) {
+    return [activeItem?.heroImage ?? HERO_BANNERS.orange, HERO_BANNERS.iron, HERO_BANNERS.graphite];
+  }
+
+  if (pathname.startsWith("/admin/accounts") || pathname.startsWith("/admin/users")) {
+    return [activeItem?.heroImage ?? HERO_BANNERS.graphite, HERO_BANNERS.iron, HERO_BANNERS.orange];
+  }
+
+  if (pathname.startsWith("/admin/analytics")) {
+    return [activeItem?.heroImage ?? HERO_BANNERS.orange, HERO_BANNERS.graphite, HERO_BANNERS.iron];
+  }
+
+  return [activeItem?.heroImage ?? HERO_BANNERS.graphite, HERO_BANNERS.iron, HERO_BANNERS.orange];
+}
+
+function buildHeroSlides(
+  pathname: string,
+  activeItem: {label?: string; heroImage?: string} | undefined,
+  viewRole: string,
+  pageMeta: {title: string; eyebrow: string; description: string}
+): HeroSlide[] {
+  const roleLabel = VIEW_ROLE_LABELS[viewRole as keyof typeof VIEW_ROLE_LABELS] ?? viewRole;
+  const [primaryImage, secondaryImage, tertiaryImage] = getHeroImages(pathname, activeItem);
+  const activeLabel = activeItem?.label ?? pageMeta.title;
+
+  if (pathname.startsWith("/admin/products")) {
+    return [
+      {
+        id: "products-1",
+        image: primaryImage,
+        eyebrow: pageMeta.eyebrow,
+        title: pageMeta.title,
+        description: pageMeta.description,
+      },
+      {
+        id: "products-2",
+        image: secondaryImage,
+        eyebrow: "Shared image handling",
+        title: "One gallery, many size variants",
+        description: "Keep S, M, L, XL, and XXL inside one visual set unless the underlying product model actually changes.",
+      },
+      {
+        id: "products-3",
+        image: tertiaryImage,
+        eyebrow: "Warehouse-aware listing",
+        title: "Show availability the way each brand really works",
+        description: "Use WH88 and WH90 only where the brand supports them, while keeping the table fast to filter and easy to trust.",
+      },
+    ];
+  }
+
+  if (pathname.startsWith("/admin/orders") || pathname.startsWith("/admin/cart")) {
+    return [
+      {
+        id: "orders-1",
+        image: primaryImage,
+        eyebrow: pageMeta.eyebrow,
+        title: pageMeta.title,
+        description: pageMeta.description,
+      },
+      {
+        id: "orders-2",
+        image: secondaryImage,
+        eyebrow: "Assisted ordering",
+        title: "Start the basket on behalf of any account",
+        description: "Super admins and ops teams can jump in with retailer context already selected and keep the approval path intact.",
+      },
+      {
+        id: "orders-3",
+        image: tertiaryImage,
+        eyebrow: `View as ${roleLabel}`,
+        title: "Review each workflow through the right lens",
+        description: "Preview what managers, sales reps, and retailers see before you push the order into the next operational step.",
+      },
+    ];
+  }
+
+  if (pathname.startsWith("/admin/accounts") || pathname.startsWith("/admin/users") || pathname.startsWith("/admin/roles")) {
+    return [
+      {
+        id: "accounts-1",
+        image: primaryImage,
+        eyebrow: pageMeta.eyebrow,
+        title: pageMeta.title,
+        description: pageMeta.description,
+      },
+      {
+        id: "accounts-2",
+        image: secondaryImage,
+        eyebrow: "Super Admin controls",
+        title: "Preview the workspace before you delegate it",
+        description: "Switch perspective quickly, validate access, then jump into retailer-led ordering or assignment changes with confidence.",
+      },
+      {
+        id: "accounts-3",
+        image: tertiaryImage,
+        eyebrow: "Assignment clarity",
+        title: "Align brands, managers, warehouses, and people",
+        description: "Keep the operational map clear so catalog, stock, and approval work stays accountable instead of fragmented.",
+      },
+    ];
+  }
+
+  if (pathname.startsWith("/admin/warehouses") || pathname.startsWith("/admin/imports")) {
+    return [
+      {
+        id: "ops-1",
+        image: primaryImage,
+        eyebrow: pageMeta.eyebrow,
+        title: pageMeta.title,
+        description: pageMeta.description,
+      },
+      {
+        id: "ops-2",
+        image: secondaryImage,
+        eyebrow: "Calibrated operations",
+        title: "Keep every stock signal believable",
+        description: "Treat imports, warehouse mapping, and product relation checks as one operational chain instead of separate admin tasks.",
+      },
+      {
+        id: "ops-3",
+        image: tertiaryImage,
+        eyebrow: `View as ${roleLabel}`,
+        title: "Make downstream teams trust the data",
+        description: "Build stock and intake views that stay clear for the teams placing, approving, and checking availability each day.",
+      },
+    ];
+  }
+
+  if (pathname.startsWith("/admin/analytics")) {
+    return [
+      {
+        id: "analytics-1",
+        image: primaryImage,
+        eyebrow: pageMeta.eyebrow,
+        title: pageMeta.title,
+        description: pageMeta.description,
+      },
+      {
+        id: "analytics-2",
+        image: secondaryImage,
+        eyebrow: "Performance focus",
+        title: "See the products and people driving momentum",
+        description: "Compare weekly movement, accountable contributors, and the lines generating the most value across the workspace.",
+      },
+      {
+        id: "analytics-3",
+        image: tertiaryImage,
+        eyebrow: activeLabel,
+        title: "Turn signals into action faster",
+        description: "Move from sales trends into orders, products, and accounts with the same visual context still intact.",
+      },
+    ];
+  }
+
+  return [
+    {
+      id: "default-1",
+      image: primaryImage,
+      eyebrow: pageMeta.eyebrow,
+      title: pageMeta.title,
+      description: pageMeta.description,
+    },
+    {
+      id: "default-2",
+      image: secondaryImage,
+      eyebrow: "Connected admin workspace",
+      title: "Keep the right work visible at the right time",
+      description: "Use one consistent workspace across products, accounts, warehouse logic, and approvals without losing operational focus.",
+    },
+    {
+      id: "default-3",
+      image: tertiaryImage,
+      eyebrow: `View as ${roleLabel}`,
+      title: "Role-aware visibility without changing the core flow",
+      description: "Preview the experience for each role while keeping real access control and admin responsibility separate.",
+    },
+  ];
+}
+
+export function AdminShell({children, user}: AdminShellProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const {theme, toggleTheme} = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const pathname = usePathname();
-  const visibleNavItems = ADMIN_NAV_ITEMS.filter(
-    (item) => !item.roles || item.roles.includes(user.role)
+  const [megaMenuOpen, setMegaMenuOpen] = useState(false);
+  const [openNavMenu, setOpenNavMenu] = useState<string | null>(null);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [viewRole, setViewRole] = useState(user.viewRole || user.role);
+  const [heroSlideIndex, setHeroSlideIndex] = useState(0);
+  const megaMenuRef = useRef<HTMLDivElement | null>(null);
+  const navMenuRef = useRef<HTMLDivElement | null>(null);
+  const profileMenuRef = useRef<HTMLDivElement | null>(null);
+  const allowedViewRoles = useMemo(() => getAvailableViewRoles(user.role), [user.role]);
+
+  const visibleNavItems = useMemo(
+    () => ADMIN_NAV_ITEMS.filter((item) => !item.roles || item.roles.includes(viewRole)),
+    [viewRole]
   );
+  const visibleRouteItems = useMemo(
+    () => ADMIN_ROUTE_ITEMS.filter((item) => !item.roles || item.roles.includes(viewRole)),
+    [viewRole]
+  );
+  const visibleCommandItems = useMemo(
+    () => ADMIN_COMMAND_ITEMS.filter((item) => !item.roles || item.roles.includes(viewRole)),
+    [viewRole]
+  );
+
   const activeItem =
-    visibleNavItems.find((item) =>
-      item.href === "/admin"
-        ? pathname === "/admin"
-        : pathname === item.href || pathname.startsWith(`${item.href}/`)
-    ) ?? visibleNavItems[0];
+    visibleRouteItems.find((item) => matchesPath(pathname, item.href)) ??
+    visibleNavItems.find((item) => matchesPath(pathname, item.href)) ??
+    visibleNavItems[0];
+  const pageMeta = useMemo(() => getAdminPageMeta(pathname), [pathname]);
+  const breadcrumbs = useMemo(() => getAdminBreadcrumbs(pathname), [pathname]);
+
+  const heroSlides = useMemo(
+    () => buildHeroSlides(pathname, activeItem, viewRole, pageMeta),
+    [pathname, activeItem, viewRole, pageMeta]
+  );
+  const activeHeroSlide = heroSlides[heroSlideIndex] ?? heroSlides[0];
+
+  const megaMenuGroups = [
+    {
+      title: "Navigate",
+      items: visibleRouteItems.filter((item) => item.group === "Navigate"),
+    },
+    {
+      title: "Create",
+      items: visibleCommandItems.filter((item) => item.group === "Create"),
+    },
+    {
+      title: "Operations",
+      items: visibleCommandItems.filter((item) => item.group === "Operations"),
+    },
+  ];
+
+  const isWideWorkspace =
+    pathname.startsWith("/admin/products/brand") ||
+    pathname === "/admin/orders" ||
+    pathname.startsWith("/admin/orders/") ||
+    pathname.startsWith("/admin/cart");
+
+  const shellWidthClass = isWideWorkspace ? "max-w-[1600px]" : "max-w-[1280px]";
+  const contentLiftClass = isWideWorkspace ? "-mt-10" : "-mt-5";
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setSearchOpen((prev) => !prev);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === "k") {
+        event.preventDefault();
+        setSearchOpen((current) => !current);
       }
     };
+
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  useEffect(() => {
+    setHeroSlideIndex(0);
+    const interval = window.setInterval(() => {
+      setHeroSlideIndex((current) => (current + 1) % heroSlides.length);
+    }, 5200);
+
+    return () => window.clearInterval(interval);
+  }, [heroSlides]);
+
+  useEffect(() => {
+    setMegaMenuOpen(false);
+    setMobileMenuOpen(false);
+    setOpenNavMenu(null);
+    setProfileMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    const handlePointerDown = (event: MouseEvent) => {
+      const target = event.target as Node;
+
+      if (megaMenuRef.current && !megaMenuRef.current.contains(target)) {
+        setMegaMenuOpen(false);
+      }
+
+      if (navMenuRef.current && !navMenuRef.current.contains(target)) {
+        setOpenNavMenu(null);
+      }
+
+      if (profileMenuRef.current && !profileMenuRef.current.contains(target)) {
+        setProfileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("mousedown", handlePointerDown);
+    return () => window.removeEventListener("mousedown", handlePointerDown);
+  }, []);
+
+  useEffect(() => {
+    setViewRole(user.viewRole || user.role);
+  }, [user.role, user.viewRole]);
+
+  const applyViewRole = (nextRole: string) => {
+    setViewRole(nextRole);
+    document.cookie = `callone-view-role=${encodeURIComponent(nextRole)}; path=/; max-age=2592000; samesite=lax`;
+    setProfileMenuOpen(false);
+    setOpenNavMenu(null);
+    setMegaMenuOpen(false);
+    router.refresh();
+  };
+
   return (
     <div className="relative min-h-screen overflow-hidden text-foreground selection:bg-primary/15 selection:text-foreground">
-      <MegaSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} role={user.role} />
+      <MegaSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} role={viewRole} />
 
       <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+        {mobileMenuOpen ? (
+          <motion.div
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            exit={{opacity: 0}}
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
             onClick={() => setMobileMenuOpen(false)}
           />
-        )}
+        ) : null}
       </AnimatePresence>
 
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#111111] text-white">
-        <div className="mx-auto flex h-[74px] max-w-[1600px] items-center gap-4 px-4 sm:px-5">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#111111]/92 text-white backdrop-blur-xl">
+        <div className="mx-auto flex h-[74px] max-w-[1600px] items-center gap-3 px-4 sm:px-5">
           <div className="flex items-center gap-3">
             <button
               className="rounded-2xl border border-white/12 bg-white/6 p-2.5 text-white/72 transition hover:text-white md:hidden"
@@ -97,67 +446,314 @@ export function AdminShell({ children, user }: AdminShellProps) {
             </Link>
           </div>
 
-          <nav className="hidden min-w-0 flex-1 items-center gap-1 overflow-x-auto hide-scrollbar lg:flex">
-            {visibleNavItems.map((item) => {
-              const isActive =
-                item.href === "/admin"
-                  ? pathname === "/admin"
-                  : pathname === item.href || pathname.startsWith(`${item.href}/`);
+          <div className="hidden min-w-0 flex-1 items-center gap-2 xl:flex">
+            <div ref={megaMenuRef} className="relative shrink-0">
+              <button
+                onClick={() => setMegaMenuOpen((current) => !current)}
+                className={clsx(
+                  "inline-flex h-11 w-11 items-center justify-center rounded-2xl border transition",
+                  megaMenuOpen
+                    ? "border-white/18 bg-white/12 text-white"
+                    : "border-white/10 bg-white/8 text-white/76 hover:text-white"
+                )}
+                aria-label="Open workspace menu"
+              >
+                <Grid2x2 size={16} />
+              </button>
 
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={clsx(
-                    "rounded-2xl px-4 py-2.5 text-sm font-semibold tracking-[0.02em] transition",
-                    isActive
-                      ? "bg-white/14 text-white"
-                      : "text-white/72 hover:bg-white/8 hover:text-white"
-                  )}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
+              <AnimatePresence>
+                {megaMenuOpen ? (
+                  <motion.div
+                    initial={{opacity: 0, y: 10}}
+                    animate={{opacity: 1, y: 0}}
+                    exit={{opacity: 0, y: 10}}
+                    className="absolute left-0 top-full z-50 mt-3 w-[min(980px,calc(100vw-48px))] overflow-hidden rounded-[28px] border border-white/10 bg-[#111111] p-4 shadow-[0_35px_100px_rgba(0,0,0,0.35)]"
+                  >
+                    <div className="mb-4 flex items-end justify-between gap-3 border-b border-white/10 pb-4">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/42">
+                          Workspace
+                        </p>
+                        <p className="mt-2 text-lg font-semibold text-white">
+                          Fast module access
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setSearchOpen(true)}
+                        className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/8 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-white/62"
+                      >
+                        <Search size={14} />
+                        Search
+                      </button>
+                    </div>
 
-          <div className="hidden flex-1 justify-center 2xl:flex">
-            <button
-              onClick={() => setSearchOpen(true)}
-              className="flex h-11 w-full max-w-[560px] items-center justify-between rounded-full border border-white/10 bg-white/8 px-4 text-left"
-            >
-              <span className="flex min-w-0 items-center gap-3 text-sm text-white/62">
-                <Search size={16} className="shrink-0 text-white/55" />
-                <span className="truncate">Search products, actions, routes, and commands</span>
-              </span>
-              <span className="flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/60">
-                <Command size={12} />
-                K
-              </span>
-            </button>
+                    <div className="grid gap-4 lg:grid-cols-3">
+                      {megaMenuGroups.map((group) => (
+                        <div
+                          key={group.title}
+                          className="rounded-[24px] border border-white/10 bg-white/4 p-3"
+                        >
+                          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-white/42">
+                            {group.title}
+                          </p>
+                          <div className="space-y-2">
+                            {group.items.map((item) => {
+                              const isActive = matchesPath(pathname, item.href);
+                              const Icon = item.icon;
+
+                              return (
+                                <Link
+                                  key={item.id}
+                                  href={item.href}
+                                  className={clsx(
+                                    "flex items-start gap-3 rounded-[20px] border px-3 py-3 transition",
+                                    isActive
+                                      ? "border-white/14 bg-white/10"
+                                      : "border-transparent bg-white/3 hover:border-white/10 hover:bg-white/8"
+                                  )}
+                                >
+                                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/8 text-white">
+                                    <Icon size={17} />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="text-sm font-semibold text-white">{item.label}</p>
+                                    <p className="mt-1 text-xs leading-5 text-white/56">
+                                      {item.description}
+                                    </p>
+                                  </div>
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                ) : null}
+              </AnimatePresence>
+            </div>
+
+            <nav className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto hide-scrollbar">
+              {visibleNavItems.map((item) => {
+                const submenuItems = getSectionItems(item.id, viewRole);
+                const isActive = matchesPath(pathname, item.href);
+
+                if (submenuItems.length) {
+                  return (
+                    <div
+                      key={item.id}
+                      ref={openNavMenu === item.id ? navMenuRef : undefined}
+                      className="relative"
+                    >
+                      <button
+                        onClick={() =>
+                          setOpenNavMenu((current) => (current === item.id ? null : item.id))
+                        }
+                        className={clsx(
+                          "inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold tracking-[0.02em] transition",
+                          isActive || openNavMenu === item.id
+                            ? "bg-white/14 text-white"
+                            : "text-white/72 hover:bg-white/8 hover:text-white"
+                        )}
+                      >
+                        {item.label}
+                        <ChevronDown
+                          size={16}
+                          className={openNavMenu === item.id ? "rotate-180 transition" : "transition"}
+                        />
+                      </button>
+
+                      <AnimatePresence>
+                        {openNavMenu === item.id ? (
+                          <motion.div
+                            initial={{opacity: 0, y: 10}}
+                            animate={{opacity: 1, y: 0}}
+                            exit={{opacity: 0, y: 10}}
+                            className="absolute left-0 top-full z-50 mt-3 w-[360px] overflow-hidden rounded-[28px] border border-white/10 bg-[#111111] p-3 shadow-[0_30px_90px_rgba(0,0,0,0.34)]"
+                          >
+                            <div className="border-b border-white/10 px-2 pb-3">
+                              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/42">
+                                {item.label}
+                              </p>
+                              <p className="mt-2 text-sm leading-6 text-white/62">
+                                {item.description}
+                              </p>
+                            </div>
+
+                            <div className="mt-3 space-y-2">
+                              {submenuItems.map((submenuItem) => {
+                                const Icon = submenuItem.icon;
+                                const childActive = matchesPath(pathname, submenuItem.href);
+                                return (
+                                  <Link
+                                    key={submenuItem.id}
+                                    href={submenuItem.href}
+                                    className={clsx(
+                                      "flex items-start gap-3 rounded-[20px] border px-3 py-3 transition",
+                                      childActive
+                                        ? "border-white/14 bg-white/10"
+                                        : "border-transparent bg-white/4 hover:border-white/10 hover:bg-white/8"
+                                    )}
+                                  >
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/8 text-white">
+                                      <Icon size={16} />
+                                    </div>
+                                    <div className="min-w-0">
+                                      <p className="text-sm font-semibold text-white">{submenuItem.label}</p>
+                                      <p className="mt-1 text-xs leading-5 text-white/56">
+                                        {submenuItem.description}
+                                      </p>
+                                    </div>
+                                  </Link>
+                                );
+                              })}
+                            </div>
+                          </motion.div>
+                        ) : null}
+                      </AnimatePresence>
+                    </div>
+                  );
+                }
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={clsx(
+                      "rounded-2xl px-4 py-2.5 text-sm font-semibold tracking-[0.02em] transition",
+                      isActive
+                        ? "bg-white/14 text-white"
+                        : "text-white/72 hover:bg-white/8 hover:text-white"
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
           </div>
 
           <div className="ml-auto flex items-center gap-2">
-            <Link
-              href="/admin/orders"
-              className="hidden rounded-2xl border border-white/10 bg-white/8 px-4 py-2.5 text-sm font-semibold text-white/80 transition hover:text-white md:inline-flex"
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/8 text-white/70 transition hover:border-white/20 hover:bg-white/12 hover:text-white"
+              aria-label="Open search"
             >
-              My Orders
+              <Search size={17} />
+            </button>
+
+            <Link
+              href="/admin/cart"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/8 text-white/70 transition hover:border-white/20 hover:bg-white/12 hover:text-white"
+              aria-label="Open cart"
+            >
+              <ShoppingCart size={17} />
             </Link>
+
             <motion.button
               whileTap={{scale: 0.94}}
               onClick={toggleTheme}
-              className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/8 text-white/70 transition hover:text-white"
+              className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/8 text-white/70 transition hover:border-white/20 hover:bg-white/12 hover:text-white"
               aria-label="Toggle theme"
             >
               {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
             </motion.button>
-            <button
-              onClick={() => signOut({callbackUrl: "/login"})}
-              className="hidden rounded-2xl border border-white/10 bg-white/8 px-4 py-2.5 text-sm font-semibold text-white/80 transition hover:text-white md:inline-flex"
-            >
-              Sign out
-            </button>
+
+            <div ref={profileMenuRef} className="relative">
+              <button
+                onClick={() => setProfileMenuOpen((current) => !current)}
+                className="inline-flex h-10 items-center gap-2 rounded-2xl border border-white/10 bg-white/8 px-2.5 text-white/80 transition hover:border-white/20 hover:bg-white/12 hover:text-white"
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-xs font-semibold uppercase">
+                  {getInitials(user.name)}
+                </div>
+                <div className="hidden text-left lg:block">
+                  <p className="text-sm font-semibold leading-none text-white">
+                    {user.name ?? "Workspace User"}
+                  </p>
+                  <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/46">
+                    {VIEW_ROLE_LABELS[user.role as keyof typeof VIEW_ROLE_LABELS] ?? user.role}
+                  </p>
+                </div>
+                <ChevronDown
+                  size={15}
+                  className={profileMenuOpen ? "rotate-180 transition" : "transition"}
+                />
+              </button>
+
+              <AnimatePresence>
+                {profileMenuOpen ? (
+                  <motion.div
+                    initial={{opacity: 0, y: 10}}
+                    animate={{opacity: 1, y: 0}}
+                    exit={{opacity: 0, y: 10}}
+                    className="absolute right-0 top-full z-50 mt-3 w-[320px] overflow-hidden rounded-[24px] border border-white/10 bg-[#111111] p-3 shadow-[0_30px_90px_rgba(0,0,0,0.34)]"
+                  >
+                    <div className="rounded-[20px] border border-white/10 bg-white/4 p-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-sm font-semibold uppercase text-white">
+                          {getInitials(user.name)}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold text-white">
+                            {user.name ?? "Workspace User"}
+                          </p>
+                          <p className="truncate text-xs text-white/55">
+                            {user.email ?? "No email available"}
+                          </p>
+                          <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/42">
+                            Logged in as {VIEW_ROLE_LABELS[user.role as keyof typeof VIEW_ROLE_LABELS] ?? user.role}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 rounded-[20px] border border-white/10 bg-white/4 p-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/42">
+                        View As
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {allowedViewRoles.map((role) => {
+                          const active = role === viewRole;
+                          return (
+                            <button
+                              key={role}
+                              onClick={() => applyViewRole(role)}
+                              className={clsx(
+                                "rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] transition",
+                                active
+                                  ? "border-white/18 bg-white/12 text-white"
+                                  : "border-white/10 bg-white/6 text-white/62 hover:text-white"
+                              )}
+                            >
+                              {VIEW_ROLE_LABELS[role]}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="mt-3 space-y-2">
+                      <Link
+                        href="/admin/orders"
+                        className="flex items-center gap-3 rounded-[18px] border border-white/10 bg-white/4 px-3 py-3 text-sm font-semibold text-white/76 transition hover:bg-white/8 hover:text-white"
+                      >
+                        <ShoppingBag size={16} />
+                        My Orders
+                      </Link>
+
+                      <button
+                        onClick={() => signOut({callbackUrl: "/login"})}
+                        className="flex w-full items-center gap-3 rounded-[18px] border border-white/10 bg-white/4 px-3 py-3 text-sm font-semibold text-white/76 transition hover:bg-white/8 hover:text-white"
+                      >
+                        <LogOut size={16} />
+                        Sign out
+                      </button>
+                    </div>
+                  </motion.div>
+                ) : null}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
       </header>
@@ -168,7 +764,7 @@ export function AdminShell({ children, user }: AdminShellProps) {
             initial={{x: -24, opacity: 0}}
             animate={{x: 0, opacity: 1}}
             exit={{x: -24, opacity: 0}}
-            className="fixed left-3 top-3 z-50 w-[300px] rounded-[28px] border border-white/10 bg-[#111111] p-4 text-white shadow-[0_30px_90px_rgba(0,0,0,0.3)] md:hidden"
+            className="fixed left-3 top-3 z-50 w-[320px] rounded-[28px] border border-white/10 bg-[#111111] p-4 text-white shadow-[0_30px_90px_rgba(0,0,0,0.3)] md:hidden"
           >
             <div className="mb-4 flex items-center justify-between">
               <div className="min-w-0">
@@ -194,72 +790,234 @@ export function AdminShell({ children, user }: AdminShellProps) {
               </button>
             </div>
 
-            <button
-              onClick={() => {
-                setSearchOpen(true);
-                setMobileMenuOpen(false);
-              }}
-              className="mb-4 flex h-11 w-full items-center justify-between rounded-full border border-white/10 bg-white/8 px-4 text-left text-sm text-white/62"
-            >
-              <span className="flex items-center gap-3">
-                <Search size={16} />
-                Search
-              </span>
-              <Command size={12} />
-            </button>
+            <div className="mb-4 grid grid-cols-3 gap-2">
+              <button
+                onClick={() => {
+                  setSearchOpen(true);
+                  setMobileMenuOpen(false);
+                }}
+                className="flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/8 text-white/72"
+              >
+                <Search size={17} />
+              </button>
+              <Link
+                href="/admin/cart"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/8 text-white/72"
+              >
+                <ShoppingCart size={17} />
+              </Link>
+              <button
+                onClick={toggleTheme}
+                className="flex h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/8 text-white/72"
+              >
+                {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+              </button>
+            </div>
 
-            <div className="space-y-1.5">
-              {visibleNavItems.map((item) => {
-                const isActive =
-                  item.href === "/admin"
-                    ? pathname === "/admin"
-                    : pathname === item.href || pathname.startsWith(`${item.href}/`);
+            <div className="mb-4 rounded-[20px] border border-white/10 bg-white/4 p-3">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-xs font-semibold uppercase">
+                  {getInitials(user.name)}
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-white">
+                    {user.name ?? "Workspace User"}
+                  </p>
+                  <p className="truncate text-xs text-white/55">{user.email ?? ""}</p>
+                </div>
+              </div>
 
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
+              <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/42">
+                View As
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {allowedViewRoles.map((role) => (
+                  <button
+                    key={role}
+                    onClick={() => {
+                      applyViewRole(role);
+                      setMobileMenuOpen(false);
+                    }}
                     className={clsx(
-                      "flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold transition",
-                      isActive
-                        ? "bg-white/14 text-white"
-                        : "text-white/72 hover:bg-white/8 hover:text-white"
+                      "rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] transition",
+                      role === viewRole
+                        ? "border-white/18 bg-white/12 text-white"
+                        : "border-white/10 bg-white/6 text-white/62 hover:text-white"
                     )}
                   >
-                    <item.icon size={17} />
-                    {item.label}
-                  </Link>
-                );
-              })}
+                    {VIEW_ROLE_LABELS[role]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              {visibleNavItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={clsx(
+                    "flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold transition",
+                    matchesPath(pathname, item.href)
+                      ? "bg-white/14 text-white"
+                      : "text-white/72 hover:bg-white/8 hover:text-white"
+                  )}
+                >
+                  <item.icon size={17} />
+                  {item.label}
+                </Link>
+              ))}
+
+              <Link
+                href="/admin/orders"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold text-white/72 transition hover:bg-white/8 hover:text-white"
+              >
+                <ShoppingBag size={17} />
+                My Orders
+              </Link>
+
+              <button
+                onClick={() => signOut({callbackUrl: "/login"})}
+                className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold text-white/72 transition hover:bg-white/8 hover:text-white"
+              >
+                <LogOut size={17} />
+                Sign out
+              </button>
             </div>
           </motion.aside>
         ) : null}
       </AnimatePresence>
 
       <div className="relative">
-        <div className="relative h-[210px] overflow-hidden bg-[#111111] text-white">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(255,255,255,0.12),transparent_22%),linear-gradient(120deg,rgba(255,255,255,0.08),transparent_35%),linear-gradient(180deg,rgba(255,255,255,0.04),transparent)]" />
-          <div className="mx-auto flex h-full max-w-[1600px] items-end px-4 pb-10 sm:px-5">
-            <div>
-              <p className="text-sm font-medium text-white/72">{activeItem?.description ?? "Internal operations workspace"}</p>
-              <h1 className="mt-3 text-[2rem] font-semibold tracking-tight text-white">
-                {activeItem?.label ?? "Dashboard"}
-              </h1>
-              <p className="mt-2 text-sm text-white/55">
-                Dense operational workspace with catalog, approvals, users, and warehouse controls.
-              </p>
-            </div>
+        <div className="relative h-[244px] overflow-hidden bg-[#111111] text-white">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeHeroSlide.id}
+              initial={{opacity: 0}}
+              animate={{opacity: 1}}
+              exit={{opacity: 0}}
+              transition={{duration: 0.5, ease: "easeOut"}}
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `linear-gradient(180deg,rgba(10,10,10,0.18),rgba(10,10,10,0.72)),url(${activeHeroSlide.image})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            />
+          </AnimatePresence>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(255,255,255,0.18),transparent_24%),linear-gradient(90deg,rgba(10,10,10,0.22),rgba(10,10,10,0.58)_52%,rgba(10,10,10,0.82))]" />
+
+          <div
+            className={clsx(
+              "relative mx-auto flex h-full items-end justify-between gap-5 px-4 pb-6 sm:px-5",
+              shellWidthClass
+            )}
+          >
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`${activeHeroSlide.id}-content`}
+                initial={{opacity: 0, y: 10}}
+                animate={{opacity: 1, y: 0}}
+                exit={{opacity: 0, y: -6}}
+                transition={{duration: 0.35, ease: "easeOut"}}
+                className="max-w-[560px] rounded-[28px] border border-white/12 bg-black/26 p-5 backdrop-blur-md"
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/68">
+                  {activeHeroSlide.eyebrow}
+                </p>
+                <h1 className="mt-3 text-[2rem] font-semibold tracking-tight text-white">
+                  {activeHeroSlide.title}
+                </h1>
+                <p className="mt-3 text-sm leading-6 text-white/72">
+                  {activeHeroSlide.description}
+                </p>
+                <div className="mt-4 flex items-center gap-2">
+                  {heroSlides.map((slide, index) => (
+                    <button
+                      key={slide.id}
+                      onClick={() => setHeroSlideIndex(index)}
+                      className={clsx(
+                        "h-2 rounded-full transition-all",
+                        heroSlideIndex === index ? "w-8 bg-white" : "w-2 bg-white/38"
+                      )}
+                      aria-label={`Show hero slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+
+            {pageMeta.actions.length ? (
+              <motion.div
+                initial={{opacity: 0, y: 10}}
+                animate={{opacity: 1, y: 0}}
+                transition={{duration: 0.35, ease: "easeOut", delay: 0.05}}
+                className="hidden max-w-[520px] flex-wrap items-end justify-end gap-3 self-end pb-1 lg:flex"
+              >
+                {pageMeta.actions.map((action) => (
+                  <Link
+                    key={`${pathname}-${action.label}-${action.href}`}
+                    href={action.href}
+                    className={clsx(
+                      "inline-flex min-h-11 items-center justify-center rounded-[20px] border px-5 py-3 text-sm font-semibold backdrop-blur-md transition",
+                      action.tone === "primary"
+                        ? "border-primary/35 bg-primary text-white shadow-[0_10px_32px_rgba(59,130,246,0.28)] hover:bg-primary/90"
+                        : "border-white/14 bg-black/28 text-white/86 hover:border-white/22 hover:bg-black/40"
+                    )}
+                  >
+                    {action.label}
+                  </Link>
+                ))}
+              </motion.div>
+            ) : null}
           </div>
         </div>
 
-        <main className="relative z-10 -mt-14 overflow-y-auto overflow-x-hidden px-3 pb-5 sm:px-4">
+        <main className={clsx("relative z-10 overflow-y-auto overflow-x-hidden px-3 pb-5 sm:px-4", contentLiftClass)}>
           <motion.div
             initial={{opacity: 0, y: 10}}
             animate={{opacity: 1, y: 0}}
             transition={{duration: 0.35, ease: "easeOut"}}
-            className="mx-auto max-w-[1600px]"
+            className={clsx("mx-auto", shellWidthClass)}
           >
+            <div className="mb-4 flex flex-wrap items-center gap-2 rounded-[22px] border border-border/60 bg-[color:var(--surface)]/94 px-4 py-3 shadow-[0_18px_60px_rgba(0,0,0,0.12)] backdrop-blur-xl">
+              {breadcrumbs.map((item, index) => (
+                <React.Fragment key={`${item.label}-${index}`}>
+                  {index > 0 ? <ChevronRight size={14} className="text-foreground/32" /> : null}
+                  {item.href ? (
+                    <Link
+                      href={item.href}
+                      className="text-sm font-medium text-foreground/56 transition hover:text-foreground"
+                    >
+                      {item.label}
+                    </Link>
+                  ) : (
+                    <span className="text-sm font-semibold text-foreground">{item.label}</span>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+            {pageMeta.actions.length ? (
+              <div className="mb-4 flex flex-wrap gap-2 lg:hidden">
+                {pageMeta.actions.map((action) => (
+                  <Link
+                    key={`${pathname}-mobile-${action.label}-${action.href}`}
+                    href={action.href}
+                    className={clsx(
+                      "inline-flex min-h-11 items-center justify-center rounded-[18px] border px-4 py-2.5 text-sm font-semibold transition",
+                      action.tone === "primary"
+                        ? "border-primary/35 bg-primary text-white hover:bg-primary/90"
+                        : "border-border/70 bg-[color:var(--surface)] text-foreground/78 hover:text-foreground"
+                    )}
+                  >
+                    {action.label}
+                  </Link>
+                ))}
+              </div>
+            ) : null}
             {children}
           </motion.div>
         </main>

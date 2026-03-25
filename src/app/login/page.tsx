@@ -15,17 +15,17 @@ export default async function LoginPage() {
     {
       label: "Super Admin",
       email: defaultEmail,
-      description: "Full system access and bootstrap control.",
+      description: "Full access to the workspace and operating controls.",
     },
     {
       label: "Manager",
       email: "manager@callone.local",
-      description: "Approval and team oversight flow.",
+      description: "Approvals, team visibility, and follow-up.",
     },
     {
       label: "Sales Rep",
       email: "sales@callone.local",
-      description: "Order creation and daily sales operations.",
+      description: "Order entry and daily sales activity.",
     },
   ];
 

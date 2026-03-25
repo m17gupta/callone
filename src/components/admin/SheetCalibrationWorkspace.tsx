@@ -1,8 +1,7 @@
 'use client';
 
-import React, {useDeferredValue, useState} from "react";
+import React, {useDeferredValue, useEffect, useState} from "react";
 import Link from "next/link";
-import {motion} from "framer-motion";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -238,6 +237,12 @@ export function SheetCalibrationWorkspace({
     warehouseFilters.length +
     (issuesOnly ? 1 : 0);
 
+  useEffect(() => {
+    if (page > pageCount) {
+      setPage(pageCount);
+    }
+  }, [page, pageCount]);
+
   async function openDataset(slug: string) {
     setLoadingSlug(slug);
 
@@ -256,6 +261,7 @@ export function SheetCalibrationWorkspace({
       setCalibratedRows(payload.rows);
       setHeaders(payload.dataset.columns);
       setDraftRows([]);
+      clearFilters();
       setPage(1);
     } catch (error) {
       console.error(error);
@@ -274,6 +280,7 @@ export function SheetCalibrationWorkspace({
       setDraftRows(parsed.rows);
       setActiveDataset(null);
       setCalibratedRows([]);
+      clearFilters();
       setDatasetName("Brand Calibration Sample");
       setDatasetDescription("Loaded from the default CSV shipped with CallawayOne.");
       setPage(1);
@@ -302,6 +309,7 @@ export function SheetCalibrationWorkspace({
       setDraftRows(parsed.rows);
       setActiveDataset(null);
       setCalibratedRows([]);
+      clearFilters();
       setDatasetName(file.name.replace(/\.[^.]+$/, ""));
       setDatasetDescription(`Uploaded from ${file.name}.`);
       setPage(1);
@@ -349,6 +357,7 @@ export function SheetCalibrationWorkspace({
       setCalibratedRows(payload.rows);
       setHeaders(payload.dataset.columns);
       setDraftRows([]);
+      clearFilters();
       setPage(1);
     } catch (error) {
       console.error(error);
@@ -507,7 +516,7 @@ export function SheetCalibrationWorkspace({
                   Saved datasets
                 </p>
                 <p className="text-sm text-foreground/56">
-                  Persisted calibration sets stored in MongoDB.
+                  Saved calibration sets ready to reopen and compare.
                 </p>
               </div>
               <span className="rounded-full border border-border/70 px-3 py-1 text-xs font-semibold text-foreground/52">
@@ -573,13 +582,13 @@ export function SheetCalibrationWorkspace({
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-sm">
-              <thead className="bg-[#111111] text-white">
-                <tr>
-                  <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.16em]">Brand reference</th>
-                  <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.16em]">Total rows</th>
-                  <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.16em]">Matched</th>
-                  <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.16em]">Partial</th>
-                  <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.16em]">Unmatched</th>
+              <thead>
+                <tr className="bg-[#111111] text-white">
+                  <StickyHeading className="px-4 py-3">Brand reference</StickyHeading>
+                  <StickyHeading className="px-4 py-3">Total rows</StickyHeading>
+                  <StickyHeading className="px-4 py-3">Matched</StickyHeading>
+                  <StickyHeading className="px-4 py-3">Partial</StickyHeading>
+                  <StickyHeading className="px-4 py-3">Unmatched</StickyHeading>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">

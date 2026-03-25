@@ -7,13 +7,14 @@ export function DataTable({headers, children}: DataTableProps) {
   return (
     <div className="overflow-hidden rounded-[24px] border border-border/60 bg-[color:var(--surface)]">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-border/60 text-left text-sm">
-          <thead className="bg-[#111111] text-white">
-            <tr>
+        <table className="min-w-full border-separate border-spacing-0 text-left text-sm">
+          <thead>
+            <tr className="bg-[#111111] text-white">
               {headers.map((header) => (
                 <th
                   key={header}
-                  className="whitespace-nowrap px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/82"
+                  className="sticky z-20 whitespace-nowrap border-b border-white/10 bg-[#111111] px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/82"
+                  style={{top: "calc(var(--admin-header-height) + 12px)"}}
                 >
                   {header}
                 </th>

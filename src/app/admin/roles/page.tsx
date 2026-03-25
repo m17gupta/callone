@@ -27,7 +27,7 @@ export default async function RolesPage() {
         }
       />
 
-      <SectionCard title="Create role" description="Custom roles are stored in Mongo and attached to users for auth + RBAC.">
+      <SectionCard title="Create role" description="Create access bundles that can be assigned to the right people across the workspace.">
         <form action={saveRole} className="grid gap-4 lg:grid-cols-2">
           <label className="block">
             <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-foreground/45">Key</span>

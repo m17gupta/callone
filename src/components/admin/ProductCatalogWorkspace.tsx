@@ -10,7 +10,6 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronsUpDown,
-  Filter,
   Package2,
   RefreshCcw,
   Search,
@@ -59,6 +58,9 @@ export type ProductCatalogRecord = {
 
 type ProductCatalogWorkspaceProps = {
   products: ProductCatalogRecord[];
+  title?: string;
+  description?: string;
+  badgeLabel?: string;
 };
 
 const SORT_OPTIONS = [
@@ -123,7 +125,12 @@ function buildExportRows(products: ProductCatalogRecord[]) {
   }));
 }
 
-export function ProductCatalogWorkspace({products}: ProductCatalogWorkspaceProps) {
+export function ProductCatalogWorkspace({
+  products,
+  title = "Products",
+  description = "Instant search, layered attribute filters, selectable rows, compact pagination, and stock-aware sorting tuned for dense admin workflows.",
+  badgeLabel = "Brand-aware catalog explorer",
+}: ProductCatalogWorkspaceProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
@@ -376,19 +383,17 @@ export function ProductCatalogWorkspace({products}: ProductCatalogWorkspaceProps
         <div className="grid gap-3 border-b border-border/60 px-4 py-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
           <div className="space-y-2">
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-foreground/42">
-              Brand-aware catalog explorer
+              {badgeLabel}
             </p>
             <div className="flex flex-wrap items-end gap-3">
               <h2 className="text-[1.85rem] font-semibold tracking-tight text-foreground">
-                Products
+                {title}
               </h2>
               <span className="rounded-full border border-border/70 bg-background/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-foreground/55">
                 {products.length} total
               </span>
             </div>
-            <p className="max-w-4xl text-sm text-foreground/62">
-              Instant search, layered attribute filters, selectable rows, compact pagination, and stock-aware sorting tuned for dense admin workflows.
-            </p>
+            <p className="max-w-4xl text-sm text-foreground/62">{description}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">

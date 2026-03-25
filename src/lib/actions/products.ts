@@ -139,6 +139,13 @@ export async function saveProduct(formData: FormData) {
         .split("\n")
         .map((value) => value.trim())
         .filter(Boolean),
+      sharedCollectionKey:
+        String(formData.get("sharedCollectionKey") ?? "").trim() || baseSku,
+      variantImageStrategy:
+        String(formData.get("variantImageStrategy") ?? "product_shared") ===
+        "variant_override"
+          ? "variant_override"
+          : "product_shared",
     },
     metadata: {
       legacyTable: String(formData.get("legacyTable") ?? "").trim(),

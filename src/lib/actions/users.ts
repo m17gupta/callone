@@ -22,6 +22,7 @@ export async function saveUser(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const roleId = String(formData.get("roleId") ?? "").trim();
   const password = String(formData.get("password") ?? "").trim();
+  const redirectTo = String(formData.get("redirectTo") ?? "").trim() || "/admin/users";
 
   if (!name || !email || !roleId) {
     throw new Error("Name, email, and role are required.");
@@ -65,13 +66,18 @@ export async function saveUser(formData: FormData) {
   }
 
   revalidatePath("/admin/users");
-  redirect("/admin/users");
+  revalidatePath("/admin/accounts");
+  revalidatePath(redirectTo);
+  redirect(redirectTo);
 }
 
 export async function deleteUser(formData: FormData) {
   await dbConnect();
   const id = String(formData.get("id") ?? "").trim();
+  const redirectTo = String(formData.get("redirectTo") ?? "").trim() || "/admin/users";
   await User.findByIdAndDelete(id);
   revalidatePath("/admin/users");
-  redirect("/admin/users");
+  revalidatePath("/admin/accounts");
+  revalidatePath(redirectTo);
+  redirect(redirectTo);
 }

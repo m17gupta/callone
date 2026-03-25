@@ -8,26 +8,26 @@ import {LoginForm} from "@/components/auth/LoginForm";
 
 const LOGIN_HIGHLIGHTS = [
   {
-    title: "Role-aware access",
-    description: "Super admin, admin, manager, sales rep, and retailer stay aligned to Mongo RBAC.",
+    title: "Role-based access",
+    description: "Each team lands in the actions, approvals, and views that match their responsibility.",
     icon: ShieldCheck,
   },
   {
-    title: "Warehouse-first stock",
-    description: "Orders reserve inventory against dynamic warehouses instead of static stock columns.",
+    title: "Warehouse visibility",
+    description: "Keep stock, availability, and routing decisions visible before every order moves ahead.",
     icon: Warehouse,
   },
   {
-    title: "Fast admin flows",
-    description: "Command search, dense tables, exports, and lightweight forms for internal ecommerce work.",
+    title: "Focused daily work",
+    description: "Review orders, products, brands, and approvals from one clean workspace.",
     icon: Zap,
   },
 ];
 
 const NEXT_STEPS = [
-  "Sign in with an admin user.",
-  "Validate brands, warehouses, and user assignments.",
-  "Create products with real variants, then place an internal order.",
+  "Sign in with your workspace account.",
+  "Review products, stock, and brand coverage.",
+  "Move into orders, approvals, and team follow-up.",
 ];
 
 export function LoginExperience({
@@ -79,15 +79,24 @@ export function LoginExperience({
             </div>
             <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-[color:var(--surface-muted)] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/55">
               <Sparkles size={14} className="text-[color:var(--accent)]" />
-              Premium Admin Rebuild
+              Callaway Workspace
             </div>
 
+            <div
+              className="mt-6 h-44 overflow-hidden rounded-[28px] border border-white/10"
+              style={{
+                backgroundImage:
+                  "linear-gradient(90deg,rgba(10,10,10,0.18),rgba(10,10,10,0.52)),url(https://callawaytech.s3.ap-south-1.amazonaws.com/omsimages/uploads/18_b3b08ebc11.png)",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            />
+
             <h1 className="mt-6 max-w-2xl text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
-              Sleek internal commerce for brands, stock, and approval-driven orders.
+              One clear place to review orders, products, stock, and approvals.
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-foreground/62 md:text-base">
-              CallawayOne is now structured as a Next.js + MongoDB admin system with dynamic product variants,
-              warehouse-aware inventory, export foundations, and a premium shell built for dense daily use.
+              Sign in to continue with brands, product availability, warehouse visibility, and approval-led order work in a cleaner, faster workspace.
             </p>
 
             <div className="mt-8 grid gap-3 md:grid-cols-3">
@@ -133,7 +142,7 @@ export function LoginExperience({
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/45">
-                        Workflow
+                        Order flow
                       </p>
                       <p className="mt-2 text-2xl font-semibold text-foreground">6-stage</p>
                     </div>
@@ -142,7 +151,7 @@ export function LoginExperience({
                     </div>
                   </div>
                   <p className="mt-2 text-sm text-foreground/58">
-                    Draft to completion with availability checks and manager approval.
+                    From draft to completion with clear checkpoints and approvals.
                   </p>
                 </div>
 
@@ -159,7 +168,7 @@ export function LoginExperience({
                     </div>
                   </div>
                   <p className="mt-2 text-sm text-foreground/58">
-                    Seeded access for super admin, admin, manager, sales rep, and retailer.
+                    Clear access levels for leadership, sales, and supporting teams.
                   </p>
                 </div>
               </div>
@@ -179,14 +188,14 @@ export function LoginExperience({
                 Welcome back
               </p>
               <h2 className="mt-2 text-3xl font-semibold tracking-tight text-foreground">
-                Sign in to Admin
+                Sign in to Workspace
               </h2>
               <p className="mt-2 text-sm leading-6 text-foreground/58">
-                Use the command search, compact tables, and dynamic workflows after login.
+                Use a role shortcut or enter your credentials directly to continue.
               </p>
             </div>
             <div className="rounded-2xl border border-border/60 bg-[#111111] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/60">
-              Secure Credentials
+              Secure access
             </div>
           </div>
 

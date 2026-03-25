@@ -7,7 +7,7 @@ This repository replaces:
 - `OLD/CallawayManagementServer` (`Node.js`)
 - `u683660902_calloms_full.sql` (`MySQL`)
 
-The current focus is the internal ecommerce admin: brands, products, variants, warehouses, users, roles, exports, and order creation with reservation-aware stock handling. Public storefront, catalog/PPT generation, upload flows, and advanced approval tooling are still in progress.
+The current focus is the internal ecommerce admin: brands, products, variants, warehouses, users, roles, exports, sheet calibration imports, and order creation with reservation-aware stock handling. Public storefront, catalog/PPT generation, upload flows beyond CSV, and advanced approval tooling are still in progress.
 
 ## Table of Contents
 - [Project Overview](#project-overview)
@@ -41,12 +41,16 @@ CallawayOne is the monolithic replacement for the legacy OMS. The rebuild keeps 
 | Warehouses | `stock_88` / `stock_90` columns | `warehouses` + `inventoryLevels` + `inventoryMovements` |
 | Blocked Qty | Legacy blocked qty rows | `blockedStock` collection + availability-aware reservations |
 | Orders | Snapshot-heavy relational flow | Mongo `orders` with pricing snapshots and timeline |
+| Sheet uploads | Separate `OLD/call-check` experiment for generic intake | Integrated `/admin/imports/sheet-calibration` workspace with Mongo-backed datasets |
 | Exports | Existing CSV/PDF/catalog expectations | First-pass CSV exports implemented, PDF/catalog pending |
 
 ## Current Status
 
 ### Implemented now
 - Next.js App Router admin shell with light and dark theme support.
+- Sticky admin header with compact navigation, brand submenus, cart entry, theme toggle, and profile-side role preview.
+- Role preview switcher in the header for "view as" navigation and search filtering by role.
+- Rotating hero banner system across admin pages using the approved Callaway imagery.
 - NextAuth credentials login backed by MongoDB users and bcrypt.
 - Middleware-level role restriction for `/admin`.
 - Bootstrap seeding for system roles, base brands, warehouses, and sample users.
@@ -63,19 +67,43 @@ CallawayOne is the monolithic replacement for the legacy OMS. The rebuild keeps 
 - Inventory reservation on order creation.
 - Inventory release on cancelled/rejected orders.
 - Inventory shipment deduction on completed orders.
+- Advanced products explorer with quick search, sticky dense table headers, row selection, attribute filters, sorting, and pagination controls.
+- Product information architecture now routes by brand section instead of a single generic catalog landing:
+  - `/admin/products/brand/callaway-softgoods`
+  - `/admin/products/brand/callaway-hardgoods`
+  - `/admin/products/brand/ogio`
+  - `/admin/products/brand/travis-mathew`
+- `/admin/cart` now acts as the assisted ordering entry and redirects into the multi-step order builder.
+- Accounts information architecture now routes by role-based account sections:
+  - `/admin/accounts/all`
+  - `/admin/accounts/admins`
+  - `/admin/accounts/managers`
+  - `/admin/accounts/sales-representatives`
+  - `/admin/accounts/retailers`
+- Shared account workspace now uses live Mongo relationships for roles, managers, assigned brands, and assigned warehouses.
+- Retailer accounts can launch assisted order creation directly into the cart/order builder.
+- Product media now supports a shared product-level image collection key so size runs can reuse one gallery set by default.
+- Redesigned dashboard with live charts, hover-ready metric cards, brand coverage, and team activity insights.
+- Separate analytics route for weekly order trends, highest-selling products, role mix, and individual contribution views.
 - CSV export endpoints for brands, warehouses, roles, users, products, and orders.
+- Sheet calibration workspace inspired by `OLD/call-check` with:
+  - default sample CSV under `public/sample-data/brand-calibration.csv`
+  - CSV upload parsing
+  - calibration against live brands/products/variants/warehouses
+  - Mongo-backed saved datasets
+  - brand relation summary table and export of calibrated sheets
 - SQL migration script foundation for products, blocked stock, users, and order snapshots.
 - Public image folder structure under `public/images/*`.
 - `README.md`, `docs/implementation_plan.md`, and `products-sample-db-schema.md` aligned to the actual rebuild.
 
 ### Implemented, but still foundational
-- Imports page and catalogs page exist as route foundations, not full job consoles.
+- Imports hub and sheet-calibration workspace are live, but broader XLSX import jobs and blocked-stock maintenance screens are still pending.
 - Legacy SQL migration script is substantially broader than the original scaffold, but still needs validation against production fixtures.
 - Order flow supports status progression and inventory transitions, but not yet multi-actor approval UI parity.
 
 ### Not implemented yet
 - File uploads for brand/product/order media.
-- UI-driven CSV/XLSX imports.
+- XLSX and multi-job import parity beyond the current CSV calibration workspace.
 - PDF export for orders.
 - Catalog/PPT generation.
 - Bulk update screens.
@@ -114,6 +142,14 @@ All media remains under `public/images/*` so current design assets can be reused
 ### 5. Snapshot-based orders
 Orders keep line pricing and participant snapshots. This preserves the legacy OMS behavior where financials and assignments must remain stable even if user, product, or pricing master data changes later.
 
+### 6. `call-check` folded into core admin
+`OLD/call-check` remains a read-only reference. Its sheet-intake concept now lives inside CallawayOne through:
+- `/admin/imports/sheet-calibration`
+- `SheetDataset` and `SheetRow` Mongo collections
+- `/api/admin/sheets` route handlers
+
+The target architecture is one admin shell, one auth system, and no separate prototype for upload intelligence.
+
 ## Role Matrix
 
 Current admin access rules:
@@ -122,6 +158,7 @@ Current admin access rules:
 |---|---|---|---|---|---|
 | `/login` | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `/admin` shell access | ✅ | ✅ | ✅ | ✅ | ❌ |
+| Header "view as" preview | ✅ | ✅ | ✅ | ✅ | n/a |
 | Brands CRUD | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Products CRUD | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Warehouse CRUD | ✅ | ✅ | ✅ | ✅ | ❌ |
@@ -142,12 +179,17 @@ System roles currently seeded:
 |---|---|---|
 | `/login` | live | Credentials auth against Mongo users |
 | `/admin` | live | Overview dashboard with live counts |
+| `/admin/analytics` | live | Weekly trends, top products, role mix, and people insights |
 | `/admin/orders` | live | Order list and detail route |
 | `/admin/orders/new` | live | Admin checkout with availability-aware reservation |
+| `/admin/cart` | live | Assisted cart entry that redirects into order creation with query defaults |
 | `/admin/orders/[id]` | live | Summary + timeline + status update |
-| `/admin/products` | live | Product list, delete, export |
+| `/admin/products` | live | Redirects into the default Callaway Softgoods brand catalog |
+| `/admin/products/brand/[section]` | live | Brand-specific catalog explorer for Softgoods, Hardgoods, Ogio, and Travis Mathew |
 | `/admin/products/new` | live | Product create with variant generation |
 | `/admin/products/[id]/edit` | live | Product edit |
+| `/admin/accounts` | live | Redirects into the complete accounts list |
+| `/admin/accounts/[section]` | live | Role-wise account workspace with create, list, edit, delete, and assignments |
 | `/admin/brands` | live | Brand create/list/export |
 | `/admin/brands/[id]/edit` | live | Brand edit |
 | `/admin/warehouses` | live | Warehouse CRUD + stock summary |
@@ -156,8 +198,8 @@ System roles currently seeded:
 | `/admin/users/[id]/edit` | live | User edit |
 | `/admin/roles` | live | Role CRUD + export |
 | `/admin/roles/[id]/edit` | live | Role edit |
-| `/admin/imports` | scaffold | UI import jobs pending |
-| `/admin/catalogs` | scaffold | Catalog/PPT generation pending |
+| `/admin/imports` | live | Import hub for calibration and migration workflows |
+| `/admin/imports/sheet-calibration` | live | CSV upload, save, calibrate, reopen, and export sheet datasets |
 | `/admin/customizer` | legacy placeholder | kept out of core admin rebuild scope |
 
 ## Collections
@@ -286,10 +328,15 @@ This is the current mature baseline. Exact parity validation against every legac
   - `/api/admin/export/users`
   - `/api/admin/export/products`
   - `/api/admin/export/orders`
+- Sheet calibration APIs:
+  - `/api/admin/sheets`
+  - `/api/admin/sheets/[slug]`
+- Default calibration sample:
+  - `public/sample-data/brand-calibration.csv`
 
 ### In progress / next
 - SQL migration from `u683660902_calloms_full.sql`
-- UI-driven CSV/XLSX imports
+- broader UI-driven CSV/XLSX imports beyond calibration intake
 - blocked stock maintenance screens
 - order PDF generation
 - catalog/PPT generation jobs
@@ -510,13 +557,22 @@ Still needed:
 ## Design System Notes
 
 The UI direction is intentionally admin-heavy, dense, and table-oriented:
-- spacious admin headers
-- responsive tables
+- sticky noir header with centered command search
+- mega-menu navigation for module access
+- responsive dense tables with sticky column headers
 - reusable cards and page sections
 - dark/light theme support
 - legacy-compatible local image references
 
-The current styling is foundation-level. More exact visual parity with the legacy design system should continue as shared admin primitives mature.
+Current palette direction uses:
+- `Phantom` `#ebebef`
+- `Eclipse` `#d3d2d0`
+- `Shadow` `#949797`
+- `Umbra` `#606260`
+- `Midnight` `#2c2d2d`
+- `Noir` `#0a0a0a`
+
+The current styling is no longer placeholder-only; it now includes the premium admin shell, login redesign, mega navigation, and dense explorer tables. More exact visual parity with the legacy design system should continue as shared admin primitives mature.
 
 ## Delivery Phases
 
@@ -546,6 +602,6 @@ The current styling is foundation-level. More exact visual parity with the legac
 
 - Product forms are still server-form based, not yet a full guided multi-step builder.
 - Order edit parity is limited to creation plus status updates; line editing is still pending.
-- Imports and catalogs routes are scaffolds, not complete tools.
+- CSV calibration intake is live, but broader XLSX import parity and catalog generation are still pending.
 - Upload handlers are not live yet, so media paths are path-first and file-management-second.
 - Migration accuracy must still be validated against real SQL samples before production import.

@@ -13,7 +13,11 @@ import {buildWarehouseAvailability, sumEffectiveAvailability} from "@/lib/utils/
 
 export const dynamic = "force-dynamic";
 
-export default async function NewOrderPage() {
+export default async function NewOrderPage({
+  searchParams,
+}: {
+  searchParams?: Record<string, string | string[] | undefined>;
+}) {
   await dbConnect();
   const [users, brands, variants, warehouses] = await Promise.all([
     User.find({status: "active"}).sort({name: 1}).lean(),
@@ -56,6 +60,20 @@ export default async function NewOrderPage() {
     blockedByVariant.set(variantId, existing);
   }
 
+  const defaultRetailerId =
+    typeof searchParams?.retailerId === "string" ? searchParams.retailerId : "";
+  const defaultManagerId =
+    typeof searchParams?.managerId === "string" ? searchParams.managerId : "";
+  const defaultSalesRepId =
+    typeof searchParams?.salesRepId === "string" ? searchParams.salesRepId : "";
+  const defaultBrandId =
+    typeof searchParams?.brandId === "string" ? searchParams.brandId : "";
+
+  const selectedRetailer =
+    users.find((user) => user._id.toString() === defaultRetailerId) ?? null;
+  const retailerAssignedBrandId =
+    selectedRetailer?.assignedBrandIds?.[0]?.toString() ?? "";
+
   return (
     <div className="space-y-8">
       <PageHeader title="Create order" description="Admin-first checkout foundation using existing variants, warehouse assignment, and discount modes." backHref="/admin/orders" />
@@ -66,6 +84,12 @@ export default async function NewOrderPage() {
           managers={users.filter((user) => user.roleKey === "manager").map((user) => ({id: user._id.toString(), label: user.name}))}
           salesReps={users.filter((user) => user.roleKey === "sales_rep").map((user) => ({id: user._id.toString(), label: user.name}))}
           brands={brands.map((brand) => ({id: brand._id.toString(), label: brand.name}))}
+          defaults={{
+            retailerId: defaultRetailerId,
+            managerId: defaultManagerId || selectedRetailer?.managerId?.toString() || "",
+            salesRepId: defaultSalesRepId,
+            brandId: defaultBrandId || retailerAssignedBrandId,
+          }}
           variants={variants.map((variant) => {
             const blockedRecords = blockedByVariant.get(variant._id.toString()) ?? [];
             const warehouseBlocked = new Map<string, number>();
