@@ -12,8 +12,7 @@ const UpdateBrandAttribute = () => {
     const dispatch=useDispatch<AppDispatch>();
    const pathname=usePathname();
    const brandCode=pathname.split("/")[4];
-   console.log("pathname",pathname)
-   console.log("brandCode",brandCode)
+
 
    const {allBrand}=useSelector((state:RootState)=>state.brand)
    const {allAttribute}= useSelector((state:RootState)=>state.attribute)

@@ -8,6 +8,7 @@ export interface ISheetDataset extends Document {
   description?: string;
   columns: string[];
   rowCount: number;
+  uniqueValues?: Record<string, string[]>;
   summary: {
     matched: number;
     partial: number;
@@ -31,6 +32,7 @@ const SheetDatasetSchema = new Schema<ISheetDataset>(
     description: {type: String, default: ""},
     columns: [{type: String}],
     rowCount: {type: Number, default: 0},
+    uniqueValues: {type: Map, of: [String], default: {}},
     summary: {
       matched: {type: Number, default: 0},
       partial: {type: Number, default: 0},

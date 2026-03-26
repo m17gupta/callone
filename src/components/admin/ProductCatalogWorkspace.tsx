@@ -181,7 +181,6 @@ export function ProductCatalogWorkspace({
         return new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime();
     }
   });
-
   const pageCount = Math.max(1, Math.ceil(sortedProducts.length / pageSize));
   const currentPage = Math.min(page, pageCount);
   const pageStart = (currentPage - 1) * pageSize;

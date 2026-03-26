@@ -162,6 +162,17 @@ export const ADMIN_NAV_ITEMS: AdminCommandItem[] = [
     roles: ["super_admin", "admin", "manager", "sales_rep"],
     heroImage: HERO_BANNERS.orange,
   },
+  // {
+  //   id: "call-check",
+  //   label: "Call Check",
+  //   description: "Revenue trends, top products, and people insights.",
+  //   href: "/admin/call-check",
+  //   icon: LayoutDashboard,
+  //   group: "Navigate",
+  //   keywords: ["analytics", "insights", "sales", "weekly"],
+  //   roles: ["super_admin", "admin", "manager", "sales_rep"],
+  //   heroImage: HERO_BANNERS.orange,
+  // },
 ];
 
 export const ADMIN_ROUTE_ITEMS: AdminCommandItem[] = [

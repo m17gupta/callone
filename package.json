@@ -13,6 +13,9 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.2",
+    "@types/react-router-dom": "^5.3.3",
+    "ag-grid-community": "^35.2.0",
+    "ag-grid-react": "^35.2.0",
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
@@ -23,6 +26,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-redux": "^9.2.0",
+    "react-router-dom": "^7.13.2",
     "tailwind-merge": "^3.5.0",
     "xlsx": "^0.18.5"
   },
