@@ -111,7 +111,7 @@ export default function ImportFile({isOpen,onClose}:Props) {
 
           const action = await dispatch(createTravisMathew(chunk));
           const result = action.payload as any;
-          console.log("result--->",result)
+    
           const chunkSummary = result?.summary as ImportSummary | undefined;
 
           if (chunkSummary) {

@@ -49,16 +49,13 @@ function normalizeItem(item: any) {
         return { error: "Missing sku" };
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const {
-        brandId: _b,
-        brand: _brand,
-        attributeSetId: _a,
-        createdAt: _c,
-        updatedAt: _u,
-        ["style_code Code"]: _legacyStyleCode,
-        ...rest
-    } = normalizedItem;
+    const rest = { ...normalizedItem };
+    delete rest.brandId;
+    delete rest.brand;
+    delete rest.attributeSetId;
+    delete rest.createdAt;
+    delete rest.updatedAt;
+    delete rest["style_code Code"];
 
     return {
         product: {
