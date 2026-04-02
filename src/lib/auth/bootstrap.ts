@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import {shouldRunRuntimeBootstrap} from "@/lib/auth/runtime-bootstrap";
 import dbConnect from "@/lib/db/connection";
 import {Brand} from "@/lib/db/models/Brand";
 import {Role} from "@/lib/db/models/Role";
@@ -16,6 +17,10 @@ const ROLE_LABELS: Record<RoleKey, string> = {
 };
 
 export async function ensureSystemBootstrap() {
+  if (!shouldRunRuntimeBootstrap()) {
+    return;
+  }
+
   try {
     console.log("BOOTSTRAP_INFO: Starting system bootstrap...");
     await dbConnect();

@@ -562,12 +562,14 @@ NEXTAUTH_MONGODB_URI=your-mongodb-uri
 NEXTAUTH_SECRET=your-nextauth-secret
 CALLONE_BOOTSTRAP_ADMIN_EMAIL=admin@callone.local
 CALLONE_BOOTSTRAP_ADMIN_PASSWORD=CalloneAdmin@123
+CALLONE_RUNTIME_BOOTSTRAP=false
 ```
 
 Important:
 
 - `NEXTAUTH_MONGODB_URI` is required at runtime.
 - Build is safe without DB only because admin/login routes are force-dynamic.
+- Runtime bootstrap is disabled in production by default so a slow or unreachable MongoDB does not surface as a Hostinger 503. If you need first-run seeding in production, set `CALLONE_RUNTIME_BOOTSTRAP=true` temporarily or run `npm run seed` against the target database once.
 
 ## Scripts
 

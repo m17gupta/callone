@@ -1,10 +1,8 @@
-import {ensureSystemBootstrap} from "@/lib/auth/bootstrap";
 import {LoginExperience} from "@/components/auth/LoginExperience";
 
 export const dynamic = "force-dynamic";
 
-export default async function LoginPage() {
-  await ensureSystemBootstrap();
+export default function LoginPage() {
   const defaultEmail =
     process.env.CALLONE_BOOTSTRAP_ADMIN_EMAIL ?? "admin@callone.local";
   const defaultPasswordHint =

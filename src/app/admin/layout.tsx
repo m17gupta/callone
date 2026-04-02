@@ -1,7 +1,5 @@
 import {cookies} from "next/headers";
-import { AdminShell } from "@/components/layout/AdminShell";
-import {ensureSystemBootstrap} from "@/lib/auth/bootstrap";
-import {ensureWorkspaceSeedData} from "@/lib/auth/seed-workspace";
+import {AdminShell} from "@/components/layout/AdminShell";
 import {requireAdminSession} from "@/lib/auth/session";
 import {resolveViewRole} from "@/lib/auth/view-role";
 
@@ -12,8 +10,6 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await ensureSystemBootstrap();
-  await ensureWorkspaceSeedData();
   const session = await requireAdminSession();
   const viewRole = resolveViewRole(
     session.user.role,
