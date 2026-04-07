@@ -69,7 +69,7 @@ export function ProductCatalogWorkspace({
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const [availableOnly, setAvailableOnly] = useState(false);
   const [sortBy, setSortBy] = useState<(typeof SORT_OPTIONS)[number]["value"]>("latest");
-  const [viewMode, setViewMode] = useState<"product" | "sku">("product");
+  const [viewMode, setViewMode] = useState<"product" | "sku">("sku");
   const [pageSize, setPageSize] = useState(25);
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);

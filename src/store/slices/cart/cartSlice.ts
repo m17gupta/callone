@@ -9,6 +9,8 @@ export interface CartItem {
   image?: string;
   qty88?: number;
   qty90?: number;
+  stock88?: number;
+  stock90?: number;
   qty?: number;
   mrp?: number;
   gst?: number;
@@ -22,7 +24,7 @@ export interface CartItem {
 
 
 interface CartState {
-  curtentCartId:string|null;
+  currentCartId: string | null;
   selectedRetailer: UserInterface | null;
   selectedManager: UserInterface | null;
   selectedSalesRep: UserInterface | null;
@@ -32,7 +34,7 @@ interface CartState {
 }
 
 const initialState: CartState = {
-  curtentCartId:null, 
+  currentCartId: null,
   selectedRetailer: null,
   selectedManager: null,
   selectedSalesRep: null,
@@ -88,6 +90,27 @@ const cartSlice = createSlice({
     setDiscount(state, action: PayloadAction<{ type: CartState['discountType'], value: number }>) {
       state.discountType = action.payload.type;
       state.discountValue = action.payload.value;
+    },
+    setCartFromOrder(state, action: PayloadAction<{
+      items: CartItem[];
+      selectedRetailer: UserInterface | null;
+      selectedManager: UserInterface | null;
+      selectedSalesRep: UserInterface | null;
+      discountType?: string;
+      discountValue?: number;
+      cartId?: string;
+    }>) {
+      state.items = action.payload.items;
+      state.selectedRetailer = action.payload.selectedRetailer;
+      state.selectedManager = action.payload.selectedManager;
+      state.selectedSalesRep = action.payload.selectedSalesRep;
+      if (action.payload.discountType) {
+        state.discountType = action.payload.discountType as any;
+      }
+      if (action.payload.discountValue !== undefined) {
+        state.discountValue = action.payload.discountValue;
+      }
+      state.currentCartId = action.payload.cartId || null;
     }
   },
 });
@@ -100,7 +123,8 @@ export const {
   removeFromCart,
   updateCartItemQty,
   clearCart,
-  setDiscount
+  setDiscount,
+  setCartFromOrder
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

@@ -68,7 +68,7 @@ export function getAdminPageMeta(pathname: string): AdminPageMeta {
     };
   }
 
-  if (pathname === "/admin/orders/new" || pathname === "/admin/cart") {
+  if (pathname === "/admin/orders/new" || pathname.startsWith("/admin/cart")) {
     return {
       title: "Build the order with confidence",
       eyebrow: "Retailer-led assisted ordering",
@@ -270,7 +270,7 @@ export function getAdminBreadcrumbs(pathname: string): BreadcrumbItem[] {
     return [{label: "Dashboard", href: "/admin"}, {label: "Orders"}];
   }
 
-  if (pathname === "/admin/orders/new" || pathname === "/admin/cart") {
+  if (pathname === "/admin/orders/new" || pathname.startsWith("/admin/cart")) {
     return [
       {label: "Dashboard", href: "/admin"},
       {label: "Orders", href: "/admin/orders"},

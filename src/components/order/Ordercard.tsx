@@ -13,11 +13,7 @@ const Ordercard = () => {
     const orderData=useMemo(()=>{
       
         if(items && items.length>0 &&
-            // selectedRetailer && 
-            // selectedRetailer?._id &&
-            // selectedManager &&
-            // selectedManager?._id &&
-            //  selectedSalesRep?._id &&
+        
              discountType &&
              discountValue
         ){

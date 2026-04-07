@@ -43,6 +43,7 @@ export function SkuTable({
   const { travismathew } = useSelector((state: RootState) => state.travisMathew);
   const { ogio } = useSelector((state: RootState) => state.ogio);
   const { hardgoods } = useSelector((state: RootState) => state.hardgoods);
+  const {softgoods} = useSelector((state: RootState) => state.softgoods);
   const {currentAttribute,allAttribute} = useSelector((state: RootState) => state.attribute);
   const { items } = useSelector((state: RootState) => state.cart);
   const dispatch = useDispatch<AppDispatch>()
@@ -67,13 +68,15 @@ export function SkuTable({
       return travismathew;
     } else if (currentAttribute?.name === "Ogio") {
       return ogio;
-    } else if (currentAttribute?.name === "Hardgoods" || currentAttribute?.name === "HardGood") {
+    } else if (currentAttribute?.name === "Callaway Hardgoods" ) {
       return hardgoods;
+    } else if (currentAttribute?.name === "Callaway Softgoods" ) {
+      return softgoods;
     }
     return [];
-  }, [currentAttribute, travismathew, ogio, hardgoods]);
+  }, [currentAttribute, travismathew, ogio, hardgoods,softgoods]);
 
- 
+
 
   return (
     <table className="min-w-full border-separate border-spacing-0 text-left text-sm">

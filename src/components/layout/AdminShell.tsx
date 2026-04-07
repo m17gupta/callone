@@ -68,7 +68,7 @@ export function AdminShell({children, user}: AdminShellProps) {
   const allowedViewRoles = useMemo(() => getAvailableViewRoles(user.role), [user.role]);
 
   const {items} = useSelector((state: RootState) => state.cart);
-
+  const {currentOrder} = useSelector((state: RootState) => state.order);
   const visibleNavItems = useMemo(
     () => ADMIN_NAV_ITEMS.filter((item) => !item.roles || item.roles.includes(viewRole)),
     [viewRole]
@@ -424,7 +424,7 @@ export function AdminShell({children, user}: AdminShellProps) {
               </button>
 
               <Link
-                href="/admin/cart"
+                href={`/admin/cart/${currentOrder?.orderNumber}`}
                 className="relative inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/8 text-white/70 transition hover:border-white/20 hover:bg-white/12 hover:text-white"
                 aria-label="Open cart"
               >

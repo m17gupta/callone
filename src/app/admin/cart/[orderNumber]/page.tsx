@@ -1,16 +1,21 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
-
+import { RootState, AppDispatch } from '@/store';
 import { Trash2, Plus, Minus, Tag, Calculator, ChevronRight, Check, Edit2, User, Search } from 'lucide-react';
 import { removeFromCart, updateCartItemQty, setDiscount, clearCart, setSelectedRetailer, setSelectedManager, setSelectedSalesRep } from '@/store/slices/cart/cartSlice';
-import { AppDispatch, RootState } from '@/store';
-import Ordercard from '@/components/order/Ordercard';
-import { PageHeader } from '@/components/admin/PageHeader';
 import { fetchUsersByRole } from '@/store/slices/users/userThunks';
+import { PageHeader } from '@/components/admin/PageHeader';
+import Image from 'next/image';
+import clsx from 'clsx';
+import Ordercard from '@/components/order/Ordercard';
 import { ProductImage } from '@/components/admin/ProductImage';
+import { OrderModel } from '@/store/slices/order/OrderType';
+import { updateOrder } from '@/store/slices/order/orderThunks';
+import { toast } from 'sonner';
+import OrderHydration from '@/components/order/OrderHydration';
 
 
 const STEPS = [
@@ -21,8 +26,8 @@ const STEPS = [
 ];
 
 export default function CartPage() {
-  const searchParams = useSearchParams();
-  const orderNumber = searchParams.get('orderNumber');
+  const params = useParams();
+  const orderNumber = params?.orderNumber as string;
   const cart = useSelector((state: RootState) => state.cart);
   const { allRetailer, allManager, allSaleRep, isFetchedAllRetailer, isFetchedAllManager, isFetchedAllSaleRep } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch<AppDispatch>();
@@ -38,7 +43,7 @@ export default function CartPage() {
     if (!isFetchedAllSaleRep) dispatch(fetchUsersByRole('sales_rep'));
   }, [dispatch, isFetchedAllRetailer, isFetchedAllManager, isFetchedAllSaleRep]);
 
-  const summary = cart.items.reduce((acc, item) => {
+  const summary = cart.items.reduce((acc: { subtotal: number, totalDiscount: number, finalTotal: number }, item) => {
     const qty = (item?.qty88 ?? 0) + (item?.qty90 ?? 0);
     const amount = (item.mrp ?? 0) * qty;
     const gstRate = item.gst ?? 0;
@@ -55,23 +60,80 @@ export default function CartPage() {
 
   const { subtotal, totalDiscount, finalTotal } = summary;
 
-  // if (!cart.selectedRetailer) {
-  //   return (
-  //     <div className="flex h-[60vh] flex-col items-center justify-center space-y-4">
-  //       <div className="rounded-full bg-foreground/5 p-6 text-foreground/40">
-  //         <Calculator size={48} />
-  //       </div>
-  //       <h2 className="text-xl font-bold">No Retailer Selected</h2>
-  //       <p className="text-foreground/60 text-center max-w-md">Please go back to the catalog and select a retailer to start an order.</p>
-  //       <button onClick={() => window.history.back()} className="rounded-2xl bg-primary px-8 py-3 font-bold text-white shadow-lg">
-  //         Go to Catalog
-  //       </button>
-  //     </div>
-  //   );
-  // }
+  const {currentOrder} = useSelector((state: RootState) => state.order);
 
+  const {travismathew} = useSelector((state: RootState) => state.travisMathew);
+  const {ogio} = useSelector((state: RootState) => state.ogio);
+  const {hardgoods} = useSelector((state: RootState) => state.hardgoods);
+
+  const handleUpdateRetailer = async(retailerId: string) => {
+    const data:OrderModel={
+      ...currentOrder,
+      retailer_id: retailerId,
+      
+    }
+    const response=await dispatch(updateOrder({ id: currentOrder?._id??"", data: data })).unwrap();
+    console.log("update retailers",response)
+      if(response){
+        setIsEditingRetailer(false);
+        toast.success("Retailer updated successfully");
+      }
+  
+  }
+
+  const handleUpdateManager = async(managerId: string) => {
+    const data:OrderModel={
+      ...currentOrder,
+      manager_id: managerId,
+    }
+    const response=await dispatch(updateOrder({ id: currentOrder?._id??"", data: data })).unwrap();
+    if(response){
+      setIsEditingManager(false);
+      toast.success("Manager updated successfully");
+    }
+  }
+
+  const handleUpdateSalesRep = async(salesRepId: string) => {
+    const data:OrderModel={
+      ...currentOrder,
+      salesrep_id: salesRepId,
+    }
+    const response=await dispatch(updateOrder({ id: currentOrder?._id??"", data: data })).unwrap();
+    if(response){
+      setIsEditingSalesRep(false);
+      toast.success("Sales Representative updated successfully");
+    }
+  }
+
+
+  const handleUpdateQty = async (itemId: string, field: 'qty88' | 'qty90', value: number, stock: number) => {
+    const validatedValue = Math.max(0, Math.min(value, stock));
+    dispatch(updateCartItemQty({ id: itemId, [field]: validatedValue }));
+
+    const updatedItems = cart.items.map(item => {
+      if (item.id === itemId) {
+        return { ...item, [field]: validatedValue };
+      }
+      return item;
+    });
+
+    const data: OrderModel = {
+      ...currentOrder,
+      items: updatedItems,
+    };
+
+    try {
+      await dispatch(updateOrder({ id: currentOrder?._id ?? "", data })).unwrap();
+    } catch (error) {
+      toast.error("Failed to update quantity");
+    }
+  };
+
+
+  
   return (
     <>
+    <OrderHydration />
     <Ordercard/>
     <div className="space-y-6 pb-20">
       <div className="flex items-center justify-between">
@@ -111,10 +173,11 @@ export default function CartPage() {
                   const retailer = allRetailer.find(r => r._id === e.target.value);
                   dispatch(setSelectedRetailer(retailer || null));
                   setIsEditingRetailer(false);
+                  handleUpdateRetailer(retailer?._id || "")
                 }}
               >
                 <option value="">Select Retailer</option>
-                {allRetailer.map(r => (
+                {allRetailer.map((r: any) => (
                   <option key={r._id} value={r._id}>{r.name}</option>
                 ))}
               </select>
@@ -163,10 +226,11 @@ export default function CartPage() {
                 const manager = allManager.find(m => m._id === e.target.value);
                 dispatch(setSelectedManager(manager || null));
                 setIsEditingManager(false);
+                handleUpdateManager(manager?._id || "");
               }}
             >
               <option value="">Select Manager</option>
-              {allManager.map(m => (
+              {allManager.map((m: any) => (
                 <option key={m._id} value={m._id}>{m.name}</option>
               ))}
             </select>
@@ -200,11 +264,12 @@ export default function CartPage() {
                 const rep = allSaleRep.find(s => s._id === e.target.value);
                 dispatch(setSelectedSalesRep(rep || null));
                 setIsEditingSalesRep(false);
+                handleUpdateSalesRep(rep?._id || "");
               }}
             >
               <option value="">Select Representative</option>
               <option value="self">Self</option>
-              {allSaleRep.map(s => (
+              {allSaleRep.map((s: any) => (
                 <option key={s._id} value={s._id}>{s.name}</option>
               ))}
             </select>
@@ -266,7 +331,7 @@ export default function CartPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border/40">
-            {cart.items.map((item, index) => {
+            {cart.items.map((item: any, index: number) => {
               const qty = (item?.qty88 ?? 0) + (item?.qty90 ?? 0);
               const amount = (item.mrp ?? 0) * qty;
               const gstRate = item.gst ?? 0;
@@ -275,6 +340,9 @@ export default function CartPage() {
               const discountAmount = lessGst * (discountValue / 100);
               const netBilling = lessGst - discountAmount;
               const finalBillValue = netBilling * (1 + gstRate / 100);
+   
+              const stock88 = item.stock88 ?? 0;
+              const stock90 = item.stock90 ?? 0;
 
               return (
                 <tr key={item.id} className="group hover:bg-foreground/[0.01] transition-colors">
@@ -295,22 +363,42 @@ export default function CartPage() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center">
-                      <input
-                        type="number"
-                        value={item.qty88}
-                        onChange={(e) => dispatch(updateCartItemQty({ id: item.id || '', qty88: parseInt(e.target.value) || 0 }))}
-                        className="w-12 rounded-lg border border-border/60 bg-foreground/5 py-1 text-center text-[10px] font-bold outline-none focus:border-primary"
-                      />
+                      <div className={clsx(
+                        "flex items-center gap-1 rounded-lg border border-border/60 bg-foreground/5 p-0.5",
+                        stock88 === 0 && "opacity-50 grayscale"
+                      )}>
+                        <span className="px-2 text-[10px] font-bold text-foreground/40 min-w-[24px] text-center">
+                          {stock88}
+                        </span>
+                        <div className="w-[1px] h-3 bg-border/40" />
+                        <input
+                          type="number"
+                          value={item.qty88}
+                          disabled={stock88 === 0}
+                          onChange={(e) => handleUpdateQty(item.id || '', 'qty88', parseInt(e.target.value) || 0, stock88)}
+                          className="w-10 bg-transparent py-1 text-center text-[10px] font-bold outline-none disabled:cursor-not-allowed"
+                        />
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center">
-                      <input
-                        type="number"
-                        value={item.qty90}
-                        onChange={(e) => dispatch(updateCartItemQty({ id: item.id || '', qty90: parseInt(e.target.value) || 0 }))}
-                        className="w-12 rounded-lg border border-border/60 bg-foreground/5 py-1 text-center text-[10px] font-bold outline-none focus:border-primary"
-                      />
+                      <div className={clsx(
+                        "flex items-center gap-1 rounded-lg border border-border/60 bg-foreground/5 p-0.5",
+                        stock90 === 0 && "opacity-50 grayscale"
+                      )}>
+                        <span className="px-2 text-[10px] font-bold text-foreground/40 min-w-[24px] text-center">
+                          {stock90}
+                        </span>
+                        <div className="w-[1px] h-3 bg-border/40" />
+                        <input
+                          type="number"
+                          value={item.qty90}
+                          disabled={stock90 === 0}
+                          onChange={(e) => handleUpdateQty(item.id || '', 'qty90', parseInt(e.target.value) || 0, stock90)}
+                          className="w-10 bg-transparent py-1 text-center text-[10px] font-bold outline-none disabled:cursor-not-allowed"
+                        />
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 text-center text-[10px] font-bold text-primary">{qty}</td>

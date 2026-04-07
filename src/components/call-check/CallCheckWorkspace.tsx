@@ -24,6 +24,8 @@ import { setOgio } from "@/store/slices/ogioSlice/ogioSlice";
 import { createOgio } from "@/store/slices/ogioSlice/ogioThunks";
 import { setHardGoods } from "@/store/slices/hardgoodSlice/hardgoodSlice";
 import { createHardGood } from "@/store/slices/hardgoodSlice/hardgoodThunks";
+import { setSoftGoods } from "@/store/slices/softgoods/softgoodsSlice";
+import { createSoftGood } from "@/store/slices/softgoods/softgoodsThunks";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -88,6 +90,7 @@ export function CallCheckWorkspace({
   const { travismathew } = useSelector((state: RootState) => state.travisMathew);
   const { ogio } = useSelector((state: RootState) => state.ogio);
   const { hardgoods } = useSelector((state: RootState) => state.hardgoods);
+  const { softgoods } = useSelector((state: RootState) => state.softgoods);
 
 
   const syncSheetParam = useCallback(
@@ -702,6 +705,103 @@ export function CallCheckWorkspace({
     void runImport();
   }, [currentAttribute?._id, currentBrand?._id, dispatch, rowData, hardgoods]);
 
+  const handleSoftGoodImport = useCallback(async () => {
+    if (!rowData.length) return;
+    setStatus('uploading');
+    setProgress(0);
+    setProgressLabel('Preparing SoftGood import...');
+
+    const chunkSize = 100;
+    const totalRows = rowData.length;
+    let insertedCount = 0;
+    let updatedCount = 0;
+    let failedCount = 0;
+    const rowErrors: ImportIssue[] = [];
+
+    const mappedData = rowData.map((item: any) => ({
+      ...item,
+      attributeSetId: currentAttribute?._id,
+      brandId: currentBrand?._id,
+      createdAt: new Date().toISOString(),
+    }));
+
+    const runImport = async () => {
+      try {
+        for (let index = 0; index < mappedData.length; index += chunkSize) {
+          const chunk = mappedData.slice(index, index + chunkSize);
+          const chunkNumber = Math.floor(index / chunkSize) + 1;
+          const totalChunks = Math.ceil(mappedData.length / chunkSize);
+          setProgressLabel(`Importing SoftGood chunk ${chunkNumber} of ${totalChunks}`);
+
+          const action = await dispatch(createSoftGood(chunk));
+          const result = action.payload as any;
+
+          const chunkSummary = result?.summary as ImportSummary | undefined;
+
+          if (chunkSummary) {
+            insertedCount += chunkSummary.insertedCount || 0;
+            updatedCount += chunkSummary.updatedCount || 0;
+            failedCount += chunkSummary.failedCount || 0;
+            rowErrors.push(...(chunkSummary.rowErrors || []).map((issue) => ({
+              ...issue,
+              rowIndex: issue.rowIndex + index,
+            })));
+          } else if (createSoftGood.rejected.match(action)) {
+            failedCount += chunk.length;
+            rowErrors.push(
+              ...chunk.map((item, rowIndex) => ({
+                rowIndex: index + rowIndex,
+                sku: item.sku || '',
+                reason: (action.payload as string) || 'Import failed',
+              }))
+            );
+          }
+          
+          setProgress(Math.min(100, Math.round(((index + chunk.length) / totalRows) * 100)));
+          setSummary({
+            totalRows,
+            insertedCount,
+            updatedCount,
+            failedCount,
+            savedCount: insertedCount + updatedCount,
+            rowErrors,
+          });
+        }
+
+        const merged = [...softgoods];
+        mappedData.forEach((item) => {
+          const key = item.sku || '';
+          const existingIndex = merged.findIndex((product) => product.sku === key);
+          if (existingIndex >= 0) {
+            merged[existingIndex] = item;
+          } else {
+            merged.push(item);
+          }
+        });
+        dispatch(setSoftGoods(merged));
+
+        if (insertedCount + updatedCount > 0 && failedCount === 0) {
+          setStatus('success');
+          setProgressLabel('SoftGood import completed successfully.');
+        } else {
+          setStatus(insertedCount + updatedCount > 0 ? 'success' : 'error');
+          setProgressLabel(
+            insertedCount + updatedCount > 0
+              ? 'SoftGood import completed with some failed rows.'
+              : 'No SoftGood data was saved to the database.'
+          );
+        }
+      } catch (error: any) {
+        console.error('SoftGood import failed:', error);
+        setStatus('error');
+        setProgressLabel(error?.message || 'SoftGood import failed');
+      }
+    };
+
+    void runImport();
+  }, [currentAttribute?._id, currentBrand?._id, dispatch, rowData, softgoods]);
+
+   
   const saveToDb = useCallback(async (selectedCollections: string[] = []) => {
     if (!rowData.length) {
       return;
@@ -719,6 +819,9 @@ export function CallCheckWorkspace({
 
         case "product_hardgoods":
             void handleHardGoodImport();
+            break;
+        case "product_softgoods":
+            void handleSoftGoodImport();
             break;
                 
       }
@@ -769,7 +872,7 @@ export function CallCheckWorkspace({
     // } finally {
     //   setIsSaving(false);
     // }
-  }, [handleTravisImport, handleOgioImport, handleHardGoodImport, rowData]);
+  }, [handleTravisImport, handleOgioImport, handleHardGoodImport, handleSoftGoodImport, rowData]);
   const autoSizeAll = useCallback(() => {
     const allColumnIds: string[] = [];
     gridRef.current?.api?.getColumns()?.forEach((column) => {
