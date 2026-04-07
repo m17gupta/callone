@@ -19,6 +19,7 @@ export interface OrderModel {
   discount_type?: string,
   discount_percent?: number,
   status?: string,
+  orderNumber?: string,
   created_at?: string;
   note?: NoteModel[];
   totalAmount?: number,

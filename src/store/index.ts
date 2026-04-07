@@ -8,6 +8,7 @@ import hardgoodReducer from './slices/hardgoodSlice/hardgoodSlice';
 import cartReducer from './slices/cart/cartSlice';
 import userReducer from './slices/users/userSlice';
 import orderReducer from './slices/order/OrderSlice';
+import softgoodsReducer from './slices/softgoods/softgoodsSlice';
 export const store = configureStore({
   reducer: {
     brand: brandReducer,
@@ -18,6 +19,7 @@ export const store = configureStore({
     cart: cartReducer,
     user: userReducer,
     order: orderReducer,
+    softgoods: softgoodsReducer,
   },
   devTools: {
     name: "CallawayOne Store"

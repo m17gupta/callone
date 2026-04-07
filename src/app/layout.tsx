@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { ReduxProvider } from "@/components/providers/ReduxProvider";
 import SessionSync from "@/components/auth/SessionSync";
+import { Toaster } from "sonner";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -34,7 +35,10 @@ export default function RootLayout({
         <ReduxProvider>
           <AuthProvider>
             <SessionSync />
-            <ThemeProvider>{children}</ThemeProvider>
+            <ThemeProvider>
+              {children}
+              <Toaster position="top-right" richColors closeButton />
+            </ThemeProvider>
           </AuthProvider>
         </ReduxProvider>
       </body>
