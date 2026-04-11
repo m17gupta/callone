@@ -247,7 +247,42 @@ export const CartTable: React.FC<CartTableProps> = ({
                     <td className="border-b border-white/5 px-6 py-4 text-right font-mono text-[12px] font-semibold text-foreground/90 group-hover:text-foreground transition-colors">₹{item.amount?.toLocaleString()}</td>
                     <td className="border-b border-white/5 px-6 py-4 text-center text-[12px] font-semibold text-foreground/30">{item.gst}%</td>
                     <td className="border-b border-white/5 px-6 py-4 text-right font-mono text-[12px] font-semibold text-foreground/60 group-hover:text-foreground transition-colors">₹{item.lessGst?.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
-                    <td className="border-b border-white/5 px-6 py-4 text-center text-[12px] font-semibold text-foreground/30">{discountValue}%</td>
+                    {/* <td className="border-b border-white/5 px-6 py-4 text-center text-[12px] font-semibold text-foreground/30">{discountValue}%</td> */}
+                    <td className="border-b border-white/5 px-6 py-4 text-center text-[12px] font-semibold text-foreground/30">
+                      <div className="flex items-center gap-2 justify-center">
+                    <input
+                      type="number"
+                      value={item.discount}
+                      disabled={isDisabled || !item.isIndividualDiscount}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value) || 0;
+                        handleUpdateItemDiscount?.(itemId, val);
+                      }}
+                     className={clsx(
+                        "w-16 min-w-[60px] rounded-lg border px-2 py-1.5 text-center text-[10px] font-bold outline-none transition-all",
+                        item.isIndividualDiscount
+                          ? "border-primary bg-primary/5 text-primary"
+                          : "border-border/60 bg-foreground/5 text-foreground/40"
+                      )}
+                    />
+                    <button
+                      onClick={() => handleToggleDiscount?.(itemId)}
+                      // disabled={isDisabled}
+                      className={clsx(
+                        "relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none",
+                        item.isIndividualDiscount ? "bg-primary" : "bg-[#ddd] border border-border/60"
+                      )}
+                    >
+                      <span
+                        className={clsx(
+                          "inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform",
+                          item.isIndividualDiscount ? "translate-x-5" : "translate-x-0.5"
+                        )}
+                      />
+                    </button>
+                  </div>
+ 
+                    </td>
                     <td className="border-b border-white/5 px-10 py-4 text-right font-mono text-[12px] font-semibold text-rose-500/80 group-hover:text-rose-500 transition-colors">₹{item.discountAmt?.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
                     <td className="border-b border-white/5 px-6 py-4">
                       <div className="flex justify-center">
@@ -272,7 +307,7 @@ export const CartTable: React.FC<CartTableProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-[1fr_380px] gap-8">
         {/* Left Side: Settings/Options */}
         <div className="flex flex-wrap gap-4 items-start">
-          <div className="rounded-3xl border border-border/40 bg-white p-6 shadow-sm flex items-center gap-6 backdrop-blur-sm">
+          <div className="rounded-3xl border border-border/40 bg-white p-4 shadow-sm flex items-center gap-6 backdrop-blur-sm">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#111111] text-white">
               <Percent size={20} />
             </div>
@@ -303,7 +338,7 @@ export const CartTable: React.FC<CartTableProps> = ({
             </div>
           </div>
 
-          <div className="rounded-3xl border border-border/40 bg-white p-6 shadow-sm flex items-center gap-2 backdrop-blur-sm">
+          {/* <div className="rounded-3xl border border-border/40 bg-white p-6 shadow-sm flex items-center gap-2 backdrop-blur-sm">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 text-foreground/40">
               <Calculator size={20} />
             </div>
@@ -322,7 +357,7 @@ export const CartTable: React.FC<CartTableProps> = ({
             />
             <span className="text-xs font-bold text-foreground/40">%</span>
           </div>
-        </div>
+        </div> */}
         </div>
         {/* Right Side: Final Totals */}
         <div className="rounded-[32px] overflow-hidden border border-border/40 bg-background shadow-[0_20px_50px_rgba(0,0,0,0.05)]">
@@ -353,7 +388,7 @@ export const CartTable: React.FC<CartTableProps> = ({
             <div className="space-y-2 pt-2 border-t-2 border-t-primary">
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/20">Total Payable Amount</span>
               <div className="flex items-baseline justify-between">
-                <span className="text-4xl font-black tracking-tighter text-[#111111] dark:text-white">
+                <span className="text-2xl font-black tracking-tighter text-[#111111] dark:text-white">
                   ₹{finalTotal.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                 </span>
                 <span className="text-[10px] font-black uppercase text-foreground/40 tracking-widest">INR</span>

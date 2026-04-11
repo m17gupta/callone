@@ -59,6 +59,7 @@ export function CatalogTable({
               <h3 className="text-xl font-black uppercase tracking-widest text-foreground">
                 {viewMode === "product" ? "Product Workspace" : "SKU Manifest"}
               </h3>
+              
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/30 italic">
                 {viewMode === "product"
                   ? "Operational Global Catalog"

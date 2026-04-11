@@ -250,7 +250,7 @@ function StickyHeading({
 }) {
   return (
     <th
-      className={`bg-[#111] text-white shadow-[0_1px_0_rgba(255,255,255,0.08)] ${className || ""}`}
+      className={`bg-[#111] text-white shadow-[0_1px_0_rgba(255,255,255,0.08)]  ${className || ""}`}
       style={{
         position: "sticky",
         top: 0,
