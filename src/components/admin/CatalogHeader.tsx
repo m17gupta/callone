@@ -263,9 +263,9 @@ export function CatalogHeader({
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="grid gap-4 rounded-[24px] border border-border/70 bg-background/75 p-4 xl:grid-cols-[repeat(4,minmax(0,1fr))]"
+            className="grid-row gap-4 rounded-[24px] border border-border/70 bg-background/75 p-4"
           >
-            <FilterGroup
+            {/* <FilterGroup
               title="Brand"
               values={brandOptions}
               selectedValues={brandFilters}
@@ -282,7 +282,8 @@ export function CatalogHeader({
               values={productTypeOptions}
               selectedValues={typeFilters}
               onToggle={(value) => setTypeFilters((current) => toggleValue(current, value))}
-            />
+            /> */}
+
             <FilterGroup
               title="Category"
               values={categoryOptions}
@@ -290,7 +291,7 @@ export function CatalogHeader({
               onToggle={(value) => setCategoryFilters((current) => toggleValue(current, value))}
             />
 
-            <div className="xl:col-span-4">
+            <div className="xl:col-span-4 mt-6">
               <div className="mb-3 flex items-center justify-between gap-3">
                 <div>
                   <h3 className="text-sm font-semibold text-foreground">Attribute filters</h3>
@@ -309,7 +310,7 @@ export function CatalogHeader({
                 </label>
               </div>
 
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-1">
                 {attributeCatalog.map((attribute) => (
                   <FilterGroup
                     key={attribute.key}

@@ -126,11 +126,11 @@ export function SkuTable({
             ))
           ) : (
             <>
-              <StickyHeading className="min-w-[320px] px-6 py-5">SKU Manifest</StickyHeading>
+              <StickyHeading className="min-w-[320px] px-6 py-5">Product SKU</StickyHeading>
               <StickyHeading className="min-w-[150px] px-6 py-5">Brand</StickyHeading>
-              <StickyHeading className="min-w-[180px] px-6 py-5">Category Archive</StickyHeading>
-              <StickyHeading className="min-w-[260px] px-6 py-5">Variant Matrix</StickyHeading>
-              <StickyHeading className="min-w-[140px] px-6 py-5">Reserve Stock</StickyHeading>
+              <StickyHeading className="min-w-[180px] px-6 py-5">Category</StickyHeading>
+              <StickyHeading className="min-w-[260px] px-6 py-5">Attributes</StickyHeading>
+              <StickyHeading className="min-w-[140px] px-6 py-5">Inventory</StickyHeading>
               <StickyHeading className="min-w-[130px] px-6 py-5">Status</StickyHeading>
             </>
           )}
@@ -149,9 +149,9 @@ export function SkuTable({
             return (
               <React.Fragment key={rowId}>
                 <tr className={clsx(
-                  "group transition-all duration-300 hover:bg-foreground/[0.02]",
-                  isSelected ? "bg-foreground/[0.03]" : "",
-                  expandedRows.has(rowId) ? "bg-foreground/[0.04]" : ""
+                  "group border-b border-border/60 transition-all duration-300 hover:bg-primary/5",
+                  isSelected ? "bg-primary/5" : "",
+                  expandedRows.has(rowId) ? "bg-primary/5" : ""
                 )}>
                   <td className="px-6 py-5 align-top">
                     <input
@@ -228,23 +228,19 @@ export function SkuTable({
                                 }}
                                 />
                               </div>
-                              <div className="min-w-0 space-y-1">
+                              <div className="min-w-0">
                                 <div className="flex flex-wrap items-center gap-2">
-                                  <p className="truncate text-sm font-black uppercase tracking-tight text-foreground">{row.sku}</p>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  {row.baseSku && (
-                                    <span className="rounded-lg border border-border/40 bg-foreground/[0.03] px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-foreground/40 italic">
-                                      {row.baseSku}
-                                    </span>
-                                  )}
-                                  <span className="text-[10px] font-black uppercase tracking-wider text-foreground/40">
-                                    {row.name}
+                                  <p className="truncate font-semibold text-foreground">{row.sku}</p>
+                                  <span className="rounded-full border border-border/70 bg-background px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-foreground/48">
+                                    {row.sku}
                                   </span>
                                 </div>
-                                {row.variantTitle && (
-                                  <p className="mt-2 line-clamp-1 text-[9px] font-black uppercase tracking-widest text-foreground/20 italic">
-                                    {row.variantTitle}
+                                <p className="mt-1 text-xs text-foreground/52">
+                                  {row.name} · {row.subcategory || row.family || "Softgoods"}
+                                </p>
+                                {row.baseSku && (
+                                  <p className="mt-2 line-clamp-1 text-xs text-foreground/45 italic">
+                                    {row.baseSku} · {row.variantTitle || "Standard Variant"}
                                   </p>
                                 )}
                               </div>
@@ -253,31 +249,22 @@ export function SkuTable({
                         );
                       }
 
-                      if (key === "status") {
-                        return (
                           <td key={key} className="px-6 py-5 align-top">
                             <span className={clsx(
-                              "inline-flex rounded-lg px-2.5 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] border",
-                              row.status === "active" 
-                                ? "bg-emerald-500/5 text-emerald-500 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.05)]" 
-                                : "bg-amber-500/5 text-amber-500 border-amber-500/20"
+                              "inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.14em]",
+                              statusClasses(row.status)
                             )}>
                               {row.status}
                             </span>
                           </td>
-                        );
-                      }
 
                       if (key === "availableStock" || key === "stock" || key === "variantStock") {
                         return (
                           <td key={key} className="px-6 py-5 align-top">
-                            <div className="flex flex-col">
-                              <span className="text-base font-black text-foreground tracking-tighter">{displayStock}</span>
-                              <p className={clsx(
-                                "text-[9px] font-black uppercase tracking-widest",
-                                displayStock > 0 ? "text-emerald-500/60" : "text-rose-500/60"
-                              )}>
-                                {displayStock > 0 ? "In Reserve" : "Awaiting Scan"}
+                            <div className="space-y-1">
+                              <p className="font-semibold text-foreground">{displayStock}</p>
+                              <p className="text-xs text-foreground/52">
+                                {displayStock > 0 ? "In Stock" : "Awaiting stock"}
                               </p>
                             </div>
                           </td>
@@ -351,11 +338,22 @@ export function SkuTable({
 
                       return (
                         <td key={key} className="px-6 py-5 align-top">
-                          {val !== undefined && val !== null ? (
-                            <span className="text-sm font-black text-foreground/70 uppercase tracking-tight">{val.toString()}</span>
-                          ) : (
-                            <span className="text-[10px] font-black text-foreground/20 uppercase tracking-widest italic">N/A</span>
-                          )}
+                          <div className="flex flex-wrap gap-2">
+                            {val !== undefined && val !== null ? (
+                               ["description", "category", "season", "style_code", "color", "style code"].includes(key.toLowerCase()) ? (
+                                 <span className="text-sm font-semibold text-foreground/70 uppercase tracking-tight">{val.toString()}</span>
+                               ) : (
+                                 val.toString().split(',').map((v: string, i: number) => (
+                                   <span key={i} className="rounded-2xl border border-border/70 bg-background px-2.5 py-1.5 text-xs text-foreground/66 shadow-sm">
+                                     {i === 0 && <span className="font-semibold text-foreground/74">{attr.label}:</span>}
+                                     {v.trim()}
+                                   </span>
+                                 ))
+                               )
+                            ) : (
+                              <span className="text-xs text-foreground/45">N/A</span>
+                            )}
+                          </div>
                         </td>
                       );
                     })
@@ -394,67 +392,93 @@ export function SkuTable({
                               onOpenPreview([primary, ...gallery].filter(Boolean), 0);
                             }}
                           />
-                          <div className="min-w-0 space-y-1">
+                          <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
-                              <p className="truncate text-sm font-black uppercase tracking-tight text-foreground">{row.sku}</p>
-                              {row.baseSku && (
-                                <span className="rounded-lg border border-border/40 bg-foreground/[0.03] px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-foreground/40 italic">
-                                  {row.baseSku}
-                                </span>
-                              )}
+                              <p className="truncate font-semibold text-foreground">{row.sku}</p>
+                              <span className="rounded-full border border-border/70 bg-background px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-foreground/48">
+                                {row.sku}
+                              </span>
                             </div>
-                            <p className="text-[10px] font-black uppercase tracking-wider text-foreground/40">{row.name}</p>
-                            <p className="line-clamp-1 text-[9px] font-black uppercase tracking-widest text-foreground/20 italic">
-                              {row.variantTitle}
+                            <p className="mt-1 text-xs text-foreground/52">
+                              {row.name} · {row.subcategory || row.family || "Softgoods"}
                             </p>
+                            {row.baseSku && (
+                              <p className="mt-2 line-clamp-1 text-xs text-foreground/45 italic">
+                                {row.baseSku} · {row.variantTitle || "Standard Variant"}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-5 align-top">
-                        <div className="flex flex-col gap-1">
-                          <span className="text-sm font-black text-foreground/80">{row.brand?.name || "Private"}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-5 align-top">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-black text-foreground/70 uppercase tracking-tight">{row.category || "General"}</span>
-                          <span className="text-[10px] font-black text-foreground/30">{displayFamily || row.subcategory || "N/A"}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-5 align-top">
-                        <div className="flex flex-col">
-                          <span className="text-base font-black text-foreground tracking-tighter">{displayStock}</span>
-                          <p className={clsx(
-                            "text-[9px] font-black uppercase tracking-widest",
-                            displayStock > 0 ? "text-emerald-500/60" : "text-rose-500/60"
-                          )}>
-                            {displayStock > 0 ? "In Reserve" : "Awaiting Scan"}
-                          </p>
-                        </div>
-                      </td>
-                      <td className="px-6 py-5 align-top">
-                        <span className={clsx(
-                           "inline-flex rounded-lg px-2.5 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] border",
-                           row.status === "active" 
-                             ? "bg-emerald-500/5 text-emerald-500 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.05)]" 
-                             : "bg-amber-500/5 text-amber-500 border-amber-500/20"
-                         )}>
-                          {row.status}
-                        </span>
-                      </td>
+                        <td className="px-6 py-5 align-top">
+                          <div className="flex flex-col gap-1">
+                            <span className="font-semibold text-foreground/80">{row.brand?.name || "Private"}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-5 align-top">
+                          <div className="flex flex-col">
+                            <span className="font-semibold text-foreground/70 uppercase tracking-tight">{row.category || "General"}</span>
+                            <span className="text-xs text-foreground/30">{displayFamily || row.subcategory || "N/A"}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-5 align-top">
+                          <div className="flex flex-wrap gap-2">
+                            {row.attributeGroups?.length ? (
+                              row.attributeGroups.slice(0, 3).map((group: any) => {
+                                const label = group.label?.toLowerCase() || "";
+                                const isStandard = ["description", "category", "season", "style_code", "color", "style code"].includes(label);
+                                
+                                if (isStandard) {
+                                  return (
+                                    <span key={group.key} className="text-sm font-semibold text-foreground/70 uppercase tracking-tight">
+                                      {group.values?.join(", ")}
+                                    </span>
+                                  );
+                                }
+
+                                return (
+                                  <span key={group.key} className="rounded-2xl border border-border/70 bg-background px-2.5 py-1.5 text-xs text-foreground/66 shadow-sm">
+                                    <span className="font-semibold text-foreground/74">{group.label}:</span>
+                                    {group.values?.slice(0, 2).join(", ")}
+                                    {group.values?.length > 2 ? ` +${group.values.length - 2}` : ""}
+                                  </span>
+                                );
+                              })
+                            ) : (
+                              <span className="text-xs text-foreground/45">No Attributes</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-5 align-top">
+                          <div className="space-y-1">
+                            <p className="font-semibold text-foreground">{displayStock}</p>
+                            <p className="text-xs text-foreground/52">
+                              {displayStock > 0 ? "In Stock" : "Awaiting stock"}
+                            </p>
+                          </div>
+                        </td>
+                        <td className="px-6 py-5 align-top">
+                          <span className={clsx(
+                             "inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.14em]",
+                             statusClasses(row.status)
+                           )}>
+                            {row.status}
+                          </span>
+                        </td>
                     </>
                   )}
                   <td className="px-6 py-5 align-top text-right">
-                    <div className="flex items-center justify-end gap-3">
+                    <div className="flex items-center justify-end gap-1.5">
                       <div className="group/action relative">
                         <Link
                           href={`/admin/products/${rowId}/edit`}
-                          className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/40 bg-foreground/[0.02] text-foreground/30 transition-all hover:bg-[#111111] hover:text-white dark:hover:bg-primary"
+                          className="flex h-9 w-9 items-center justify-center rounded-xl border border-primary/10 bg-primary/4 text-primary transition-all hover:bg-primary hover:text-white"
                         >
                           <Pencil size={16} />
                         </Link>
-                        <div className="absolute -top-9 left-1/2 -translate-x-1/2 scale-50 opacity-0 transition-all group-hover/action:scale-100 group-hover/action:opacity-100">
-                          <span className="rounded bg-[#111111] px-2 py-1 text-[8px] font-black uppercase tracking-widest text-white">Edit</span>
+                        <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-black/80 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white opacity-0 transition-all group-hover/action:opacity-100">
+                          Edit
+                          <div className="absolute top-full left-1/2 h-1 w-1 -translate-x-1/2 border-x-4 border-t-4 border-x-transparent border-t-black/80" />
                         </div>
                       </div>
 
@@ -462,7 +486,7 @@ export function SkuTable({
                         <button
                           onClick={() => handleDelete(rowId)}
                           disabled={deletingId === rowId}
-                          className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/40 bg-foreground/[0.02] text-foreground/30 transition-all hover:bg-rose-500 hover:text-white hover:border-rose-500 disabled:opacity-50"
+                          className="flex h-9 w-9 items-center justify-center rounded-xl border border-danger/10 bg-danger/4 text-danger transition-all hover:bg-danger hover:text-white disabled:opacity-50"
                         >
                           {deletingId === rowId ? (
                             <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -470,8 +494,9 @@ export function SkuTable({
                             <Trash2 size={16} />
                           )}
                         </button>
-                        <div className="absolute -top-9 left-1/2 -translate-x-1/2 scale-50 opacity-0 transition-all group-hover/action:scale-100 group-hover/action:opacity-100">
-                          <span className="rounded bg-rose-600 px-2 py-1 text-[8px] font-black uppercase tracking-widest text-white">Delete</span>
+                        <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-red-600 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white opacity-0 transition-all group-hover/action:opacity-100">
+                          Delete
+                          <div className="absolute top-full left-1/2 h-1 w-1 -translate-x-1/2 border-x-4 border-t-4 border-x-transparent border-t-red-600" />
                         </div>
                       </div>
                     </div>
@@ -490,7 +515,7 @@ export function SkuTable({
                         >
                           <div className="mx-6 mb-6 mt-2 rounded-[24px] border border-border/20 bg-white/40 dark:bg-white/[0.02] p-8 shadow-inner backdrop-blur-xl">
                               <div className="mb-4 flex items-center justify-between border-b border-border/10 pb-4">
-                                 <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground/20 italic">Variant Extension Suite</h4>
+                                 <h4 className="text-[10px] font-semibold uppercase tracking-[0.4em] text-foreground/20 italic">Variant Extension Suite</h4>
                                  <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
                               </div>
                               <ExtensionTable
@@ -549,7 +574,7 @@ function StickyHeading({
         zIndex: 20,
       }}
     >
-      <div className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50 italic py-2">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/82">
         {children}
       </div>
     </th>
