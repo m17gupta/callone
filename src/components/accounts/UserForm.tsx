@@ -271,7 +271,7 @@ export function UserForm({
             <button
               type="submit"
               disabled={isPending}
-              className="rounded-2xl bg-primary px-8 py-3.5 text-sm font-bold text-white shadow-[0_12px_30px_rgba(15,132,255,0.3)] transition-all hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(15,132,255,0.4)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-2xl bg-primary px-8 py-3.5 text-sm font-bold text-foreground shadow-[0_12px_30px_rgba(15,132,255,0.3)] transition-all hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(15,132,255,0.4)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isPending ? "Saving..." : isEdit ? "Update Account" : "Save Account"}
             </button>
@@ -279,7 +279,7 @@ export function UserForm({
             <button
               type="button"
               onClick={() => router.back()}
-              className="rounded-2xl bg-primary px-8 py-3.5 text-sm font-bold text-white shadow-[0_12px_30px_rgba(15,132,255,0.3)] transition-all hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(15,132,255,0.4)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-2xl bg-primary px-8 py-3.5 text-sm font-bold text-foreground shadow-[0_12px_30px_rgba(15,132,255,0.3)] transition-all hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(15,132,255,0.4)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
@@ -289,3 +289,4 @@ export function UserForm({
     </div>
   );
 }
+

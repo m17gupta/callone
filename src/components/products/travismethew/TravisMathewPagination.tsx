@@ -17,17 +17,17 @@ export function TravisMathewPagination({ currentPage, pageCount, onPageChange }:
         <button
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-border/70 bg-transparent text-foreground/70 disabled:opacity-50 hover:bg-white/5 transition-colors"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-border/70 bg-transparent text-foreground/70 disabled:opacity-50 hover:bg-card/5 transition-colors"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-border/70 bg-white/10 text-sm font-semibold text-foreground/76">
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-border/70 bg-card/10 text-sm font-semibold text-foreground/76">
           {currentPage}
         </div>
         <button
           onClick={() => onPageChange(Math.min(pageCount, currentPage + 1))}
           disabled={currentPage >= pageCount || pageCount === 0}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-border/70 bg-transparent text-foreground/70 disabled:opacity-50 hover:bg-white/5 transition-colors"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-border/70 bg-transparent text-foreground/70 disabled:opacity-50 hover:bg-card/5 transition-colors"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
@@ -35,3 +35,4 @@ export function TravisMathewPagination({ currentPage, pageCount, onPageChange }:
     </div>
   );
 }
+

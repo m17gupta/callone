@@ -23,7 +23,7 @@ export function ProductImage({ brandName, rowData, alt = "Product Image", classN
     // Get the raw image source and filename
     const rawUrl = rowData?.primary_url || rowData?.primary_image_url;
     const skuValue = rowData?.sku || rowData?.baseSku;
-
+  console.log("rowData", rowData)
     if (!rawUrl) return;
 
     // 1. If it's already an absolute URL or starts with /, use it directly
@@ -46,18 +46,19 @@ export function ProductImage({ brandName, rowData, alt = "Product Image", classN
   }, [brandName, rowData, s3_url, s3_url_ogio]);
 
   const displaySrc = primaryImage;
+  console.log("displaySrc", displaySrc)
 
   if (!displaySrc || error) {
     return (
-      <div className={`flex items-center justify-center rounded-2xl bg-[#1D1D1D] text-white/20 ${className}`}>
-        <Package2 className="h-5 w-5 text-white" />
+      <div className={`flex items-center justify-center rounded-2xl bg-card text-foreground/20 ${className}`}>
+        <Package2 className="h-5 w-5 text-foreground" />
       </div>
     );
   }
 
   return (
     <div
-      className={`group relative cursor-pointer overflow-hidden rounded-2xl bg-[#1D1D1D] shadow-sm ring-1 ring-white/5 transition-all hover:ring-2 hover:ring-primary/50 ${className}`}
+      className={`group relative cursor-pointer overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-border/5 transition-all hover:ring-2 hover:ring-primary/50 ${className}`}
       onClick={(e) => {
         if (onClick) {
           e.stopPropagation();
@@ -73,7 +74,8 @@ export function ProductImage({ brandName, rowData, alt = "Product Image", classN
         onError={() => setError(true)}
         sizes="(max-width: 768px) 44px, 44px"
       />
-      <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
+      <div className="absolute inset-0 bg-background/0 transition-colors group-hover:bg-background/10" />
     </div>
   );
 }
+

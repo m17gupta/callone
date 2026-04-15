@@ -18,15 +18,15 @@ function compactNumber(value: number) {
 function toneClasses(tone?: BreakdownItem["tone"]) {
   switch (tone) {
     case "emerald":
-      return "bg-white/8 text-foreground/86";
+      return "bg-card/8 text-foreground/86";
     case "amber":
-      return "bg-white/8 text-foreground/86";
+      return "bg-card/8 text-foreground/86";
     case "rose":
-      return "bg-white/8 text-foreground/86";
+      return "bg-card/8 text-foreground/86";
     case "blue":
-      return "bg-white/8 text-foreground/86";
+      return "bg-card/8 text-foreground/86";
     default:
-      return "bg-white/8 text-foreground/80";
+      return "bg-card/8 text-foreground/80";
   }
 }
 
@@ -48,10 +48,10 @@ export function InsightMetricCard({
   return (
     <div className="group premium-card relative overflow-hidden rounded-[24px] p-6 transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
       <div className="flex items-start justify-between">
-        <div className="mb-5 h-px w-16 rounded-full bg-white/24 transition group-hover:w-24" />
+        <div className="mb-5 h-px w-16 rounded-full bg-card/24 transition group-hover:w-24" />
         {(Icon || image) && (
           <div 
-            className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl border border-white/8 bg-white/5 text-foreground transition duration-300 group-hover:scale-110"
+            className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl border border-border/8 bg-card/5 text-foreground transition duration-300 group-hover:scale-110"
           >
             {image ? (
               <img src={image} alt={label} className="h-full w-full object-contain p-1.5 grayscale contrast-125 brightness-110" />
@@ -98,12 +98,12 @@ export function TrendCard({
           <p className="text-base font-semibold tracking-tight text-foreground">{title}</p>
           <p className="mt-1 text-sm text-foreground/62">{description}</p>
         </div>
-        <div className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-foreground/52">
+        <div className="rounded-full border border-border/8 bg-card/[0.03] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-foreground/52">
           Last {points.length} weeks
         </div>
       </div>
 
-      <div className="mt-5 overflow-hidden rounded-[24px] border border-white/8 bg-[color:var(--surface-muted)] p-5">
+      <div className="mt-5 overflow-hidden rounded-[24px] border border-border/8 bg-[color:var(--surface-muted)] p-5">
         <svg viewBox="0 0 100 76" className="h-52 w-full">
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
@@ -134,7 +134,7 @@ export function TrendCard({
 
           <div className="mt-3 grid gap-2 md:grid-cols-4 xl:grid-cols-8">
             {points.map((point) => (
-            <div key={point.label} className="rounded-2xl border border-white/8 bg-white/[0.03] px-3 py-2">
+            <div key={point.label} className="rounded-2xl border border-border/8 bg-card/[0.03] px-3 py-2">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/60">
                 {point.label}
               </p>
@@ -169,7 +169,7 @@ export function BreakdownCard({
       <div className="mt-5 space-y-3">
         {items.length ? (
           items.map((item) => (
-            <div key={item.label} className="rounded-[22px] border border-white/8 bg-[color:var(--surface-muted)] p-4 transition hover:-translate-y-1 hover:bg-white/[0.04]">
+            <div key={item.label} className="rounded-[22px] border border-border/8 bg-[color:var(--surface-muted)] p-4 transition hover:-translate-y-1 hover:bg-card/[0.04]">
               <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-sm font-semibold capitalize text-foreground">{item.label}</p>
@@ -181,16 +181,16 @@ export function BreakdownCard({
                   {item.value}
                 </span>
               </div>
-              <div className="mt-3 h-2 rounded-full bg-white/8">
+              <div className="mt-3 h-2 rounded-full bg-card/8">
                 <div
-                  className={`h-2 rounded-full ${item.tone ? "bg-white" : "bg-[color:var(--surface-strong)]"}`}
+                  className={`h-2 rounded-full ${item.tone ? "bg-card" : "bg-[color:var(--surface-strong)]"}`}
                   style={{width: `${(item.value / maxValue) * 100}%`}}
                 />
               </div>
             </div>
           ))
         ) : (
-          <div className="rounded-[22px] border border-dashed border-white/10 bg-[color:var(--surface-muted)] px-4 py-6 text-sm text-foreground/62">
+          <div className="rounded-[22px] border border-dashed border-border/10 bg-[color:var(--surface-muted)] px-4 py-6 text-sm text-foreground/62">
             No activity recorded yet.
           </div>
         )}
@@ -220,7 +220,7 @@ export function LeaderboardCard({
       <div className="mt-5 space-y-3">
         {items.length ? (
           items.map((item, index) => (
-            <div key={`${item.label}-${index}`} className="rounded-[22px] border border-white/8 bg-[color:var(--surface-muted)] px-4 py-4 transition hover:-translate-y-1 hover:scale-[1.01] hover:border-white/18 hover:bg-white/[0.04]">
+            <div key={`${item.label}-${index}`} className="rounded-[22px] border border-border/8 bg-[color:var(--surface-muted)] px-4 py-4 transition hover:-translate-y-1 hover:scale-[1.01] hover:border-border/18 hover:bg-card/[0.04]">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-foreground">{item.label}</p>
@@ -264,7 +264,7 @@ export function BrandCatalogCard({
       <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {items.length ? (
           items.map((item) => (
-            <div key={item.label} className="rounded-[22px] border border-white/8 bg-[color:var(--surface-muted)] p-4 transition hover:-translate-y-1 hover:scale-[1.01] hover:border-white/18 hover:bg-white/[0.04]">
+            <div key={item.label} className="rounded-[22px] border border-border/8 bg-[color:var(--surface-muted)] p-4 transition hover:-translate-y-1 hover:scale-[1.01] hover:border-border/18 hover:bg-card/[0.04]">
               <p className="text-sm font-semibold text-foreground">{item.label}</p>
               <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                 <div>
@@ -291,3 +291,4 @@ export function BrandCatalogCard({
     </div>
   );
 }
+

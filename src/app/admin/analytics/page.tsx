@@ -70,7 +70,7 @@ export default async function AnalyticsPage() {
             </p>
           </div>
 
-          <div className="rounded-[24px] border border-white/8 bg-white/[0.03] p-4">
+          <div className="rounded-[24px] border border-white/8 bg-black/30 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/60">
               Quick insight
             </p>
@@ -94,25 +94,25 @@ export default async function AnalyticsPage() {
             label="Order value"
             value={money.format(insights.headline.totalRevenue)}
             detail="Combined value across active order records."
-            accent="#2f7ff4"
+            accent="#111111"
           />
           <InsightMetricCard
             label="Orders in flow"
             value={String(insights.headline.totalOrders)}
             detail="Orders currently tracked in the workspace."
-            accent="#606260"
+            accent="#4b4b4b"
           />
           <InsightMetricCard
             label="Best week"
             value={bestWeek.label}
             detail={money.format(bestWeek.value)}
-            accent="#1aa661"
+            accent="#6b6b6b"
           />
           <InsightMetricCard
             label="Top product"
             value={topProduct ? String(topProduct.value) : "0"}
             detail={topProduct ? `${topProduct.label}` : "No ordered products yet"}
-            accent="#d4a017"
+            accent="#8a8a8a"
           />
         </div>
       </section>

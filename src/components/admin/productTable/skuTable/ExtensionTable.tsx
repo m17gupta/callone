@@ -30,17 +30,17 @@ export function ExtensionTable({
   return (
     <table className="min-w-full text-left">
       <thead>
-        <tr className="bg-[#111111] text-white">
+        <tr className="bg-card text-foreground">
           <th className="px-6 py-4 w-14">
-            <input type="checkbox" className="h-4 w-4 rounded border-white/20 bg-transparent accent-primary" />
+            <input type="checkbox" className="h-4 w-4 rounded border-border/20 bg-transparent accent-primary" />
           </th>
-          <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/50 italic">SKU Manifest</th>
-          <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/50 italic">Style ID</th>
-          <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/50 italic">Size Map</th>
-          <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/50 italic">Qty-90</th>
-          <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/50 italic">Qty-88</th>
-          <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/50 italic">Aggregate</th>
-          <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/50 italic text-right">Market Pricing</th>
+          <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-foreground/50 italic">SKU Manifest</th>
+          <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-foreground/50 italic">Style ID</th>
+          <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-foreground/50 italic">Size Map</th>
+          <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-foreground/50 italic">Qty-90</th>
+          <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-foreground/50 italic">Qty-88</th>
+          <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-foreground/50 italic">Aggregate</th>
+          <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-foreground/50 italic text-right">Market Pricing</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-border/10">
@@ -90,7 +90,7 @@ export function ExtensionTable({
               <td className="px-6 py-4 text-right">
                 <div className="flex flex-col">
                   <span className="text-sm font-black text-foreground tracking-tighter">₹{(vRow.amount || vRow.mrp || 0).toLocaleString()}</span>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500/60 italic">Market Rate</span>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-foreground/40 italic">Market Rate</span>
                 </div>
               </td>
             </tr>
@@ -100,3 +100,4 @@ export function ExtensionTable({
     </table>
   );
 }
+

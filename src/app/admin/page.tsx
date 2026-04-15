@@ -82,28 +82,28 @@ export default async function AdminDashboardPage() {
                   label="Travis Mathew"
                   value={String(getBrandData("travis").products)}
                   detail="Total products currently active in the Travis Mathew catalog."
-                  accent="#c0f42fff"
+                  accent="#111111"
                   image={"https://callawaytech.s3.ap-south-1.amazonaws.com/omsimages/uploads/tm_thum_23fdeb8c29.png"}
                 />
                 <InsightMetricCard
                   label="Ogio"
                   value={String(getBrandData("ogio").products)}
                   detail="Products currently available in the OGIO product line."
-                  accent="#626160ff"
+                  accent="#4b4b4b"
                   image="https://callawaytech.s3.ap-south-1.amazonaws.com/omsimages/uploads/ogio_favicon_ac591c347e_8de0fee6f4.png"
                 />
                 <InsightMetricCard
                   label="Callaway Softgoods"
                   value={String(getBrandData("softgoods").products)}
                   detail="Active softgoods items ready for sales and distribution."
-                  accent="#a64b1aff"
+                  accent="#6b6b6b"
                   image="https://callawaytech.s3.ap-south-1.amazonaws.com/omsimages/uploads/icon_callway_f25555115b.png"
                 />
                 <InsightMetricCard
                   label="Callaway Hardgoods"
                   value={String(getBrandData("hardgoods").products)}
                   detail="Hardware and equipment products in the current inventory."
-                  accent="#d45c17ff"
+                  accent="#8a8a8a"
                   image="https://callawaytech.s3.ap-south-1.amazonaws.com/omsimages/uploads/icon_callway_f25555115b.png"
                 />
               
@@ -116,35 +116,35 @@ export default async function AdminDashboardPage() {
             label="Order value"
             value={money.format(insights.headline.totalRevenue)}
             detail={`${insights.headline.totalOrders} live orders tracked across the workspace.`}
-            accent="#2f7ff4"
+            accent="#111111"
             icon={CreditCard}
           />
           <InsightMetricCard
             label="Active products"
             value={String(insights.headline.activeProducts)}
             detail="Total products currently available to sales and admin teams."
-            accent="#606260"
+            accent="#4b4b4b"
             icon={ShoppingBag}
           />
           <InsightMetricCard
             label="Available units"
             value={String(insights.headline.availableUnits)}
             detail="Stock ready to allocate across active warehouse locations."
-            accent="#1aa661"
+            accent="#6b6b6b"
             icon={Warehouse}
           />
           <InsightMetricCard
             label="Pending approvals"
             value={String(insights.headline.pendingApprovals)}
             detail="Orders waiting on availability review or approval."
-            accent="#d4a017"
+            accent="#8a8a8a"
             icon={ClipboardCheck}
           />
           <InsightMetricCard
             label="Average order"
             value={money.format(insights.headline.averageOrderValue)}
             detail="Average value per active order in the current system."
-            accent="#949797"
+            accent="#b5b5b5"
             icon={TrendingUp}
           />
         </div>

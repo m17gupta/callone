@@ -12,7 +12,7 @@ export const OrderItemsTable = ({ items }: OrderItemsTableProps) => {
   return (
     <div className="overflow-hidden rounded-xl border border-white/10 bg-black/20">
       <table className="w-full text-left text-xs">
-        <thead className="bg-white/5 text-[10px] font-bold uppercase tracking-widest text-white/50">
+        <thead className="bg-white/5 text-[10px] font-bold uppercase tracking-widest text-white/70">
           <tr>
             <th className="px-4 py-3">Brand</th>
             <th className="px-4 py-3">SKU</th>
@@ -35,9 +35,9 @@ export const OrderItemsTable = ({ items }: OrderItemsTableProps) => {
                 <td className="px-4 py-3 text-white/50">{item.description}</td>
                 <td className="px-4 py-3 text-center text-white/70">{item.qty88 || 0}</td>
                 <td className="px-4 py-3 text-center text-white/70">{item.qty90 || 0}</td>
-                <td className="px-4 py-3 text-center font-bold text-primary">{totalQty}</td>
+                <td className="px-4 py-3 text-center font-bold text-white">{totalQty}</td>
                 <td className="px-4 py-3 text-right text-white/60">₹{item.mrp?.toLocaleString()}</td>
-                <td className="px-4 py-3 text-right text-rose-400/80">₹{item.discount?.toLocaleString() || 0}</td>
+                <td className="px-4 py-3 text-right text-white/70">₹{item.discount?.toLocaleString() || 0}</td>
                 <td className="px-4 py-3 text-right font-bold text-white">₹{item.finalAmount?.toLocaleString()}</td>
               </tr>
             );

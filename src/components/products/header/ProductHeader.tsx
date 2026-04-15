@@ -33,19 +33,19 @@ const ProductHeader = ({title,description,totalCount,onImport,onExportVisible}:p
       <div className="flex flex-wrap items-center gap-2">
         <button
           onClick={onImport}
-          className="rounded-2xl border border-border/70 bg-transparent px-4 py-2.5 text-sm font-semibold text-foreground/76 transition-colors hover:bg-white/5"
+          className="rounded-2xl border border-border/70 bg-transparent px-4 py-2.5 text-sm font-semibold text-foreground/76 transition-colors hover:bg-card/5"
         >
           Import file
         </button>
         <button
           onClick={onExportVisible}
-          className="rounded-2xl border border-border/70 bg-transparent px-4 py-2.5 text-sm font-semibold text-foreground/76 transition-colors hover:bg-white/5"
+          className="rounded-2xl border border-border/70 bg-transparent px-4 py-2.5 text-sm font-semibold text-foreground/76 transition-colors hover:bg-card/5"
         >
           Export visible
         </button>
         <Link
           href="/admin/products/new"
-          className="rounded-2xl bg-[#4b8df8] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#3b7de8]"
+          className="rounded-2xl bg-background px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-background/85"
         >
           New product
         </Link>
@@ -55,3 +55,4 @@ const ProductHeader = ({title,description,totalCount,onImport,onExportVisible}:p
 }
 
 export default ProductHeader
+

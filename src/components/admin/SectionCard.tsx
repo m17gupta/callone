@@ -14,7 +14,7 @@ export function SectionCard({
   return (
     <section className="premium-card overflow-hidden rounded-[28px]">
       {(title || action) && (
-        <div className="flex flex-col gap-4 border-b border-white/8 px-7 py-7 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-4 border-b border-border/8 px-7 py-7 lg:flex-row lg:items-center lg:justify-between">
           <div>
             {title ? <h2 className="text-[11px] font-semibold uppercase tracking-[0.24em] text-foreground/62">{title}</h2> : null}
             {description ? (
@@ -28,3 +28,4 @@ export function SectionCard({
     </section>
   );
 }
+

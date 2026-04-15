@@ -85,7 +85,7 @@ export default async function NewProductPage() {
             <textarea name="galleryPaths" rows={3} placeholder="/images/products/callaway/polo-1.jpg&#10;/images/products/callaway/polo-2.jpg" className="w-full rounded-2xl border border-border/70 bg-background px-4 py-3 text-sm outline-none" />
           </label>
           <div className="lg:col-span-2 flex justify-end">
-            <button type="submit" className="rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-white">Create product</button>
+            <button type="submit" className="rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-background">Create product</button>
           </div>
         </form>
       </SectionCard>

@@ -65,7 +65,7 @@ export default async function BrandsPage() {
             Active
           </label>
           <div className="lg:col-span-2 flex justify-end">
-            <button type="submit" className="rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-white">Save brand</button>
+            <button type="submit" className="rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-background">Save brand</button>
           </div>
         </form>
       </SectionCard>

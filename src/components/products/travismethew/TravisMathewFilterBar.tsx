@@ -44,18 +44,18 @@ export function TravisMathewFilterBar({
 
       <button
         onClick={onToggleFilters}
-        className="inline-flex items-center justify-center gap-2 rounded-[20px] border border-border/70 bg-transparent px-4 py-3 text-sm font-semibold text-foreground/76 transition-colors hover:bg-white/5"
+        className="inline-flex items-center justify-center gap-2 rounded-[20px] border border-border/70 bg-transparent px-4 py-3 text-sm font-semibold text-foreground/76 transition-colors hover:bg-card/5"
       >
         <SlidersHorizontal className="h-4 w-4" />
         Filters
         {activeFilterCount > 0 && (
-          <span className="rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-semibold text-white">
+          <span className="rounded-full bg-card/20 px-2 py-0.5 text-[11px] font-semibold text-foreground">
             {activeFilterCount}
           </span>
         )}
       </button>
 
-      <label className="inline-flex items-center gap-3 rounded-[20px] border border-border/70 bg-transparent px-4 py-3 text-sm font-semibold text-foreground/76 transition-colors hover:bg-white/5">
+      <label className="inline-flex items-center gap-3 rounded-[20px] border border-border/70 bg-transparent px-4 py-3 text-sm font-semibold text-foreground/76 transition-colors hover:bg-card/5">
         <ArrowDownUp className="h-4 w-4 text-foreground/45" />
         <select
           value={sortBy}
@@ -63,14 +63,14 @@ export function TravisMathewFilterBar({
           className="appearance-none border-none bg-transparent p-0 pr-2 text-sm font-semibold outline-none focus:ring-0 cursor-pointer"
         >
           {SORT_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value} className="bg-[#1a1a1a] text-foreground">
+            <option key={option.value} value={option.value} className="bg-card text-foreground">
               {option.label}
             </option>
           ))}
         </select>
       </label>
 
-      <label className="inline-flex items-center gap-3 rounded-[20px] border border-border/70 bg-transparent px-4 py-3 text-sm font-semibold text-foreground/76 transition-colors hover:bg-white/5">
+      <label className="inline-flex items-center gap-3 rounded-[20px] border border-border/70 bg-transparent px-4 py-3 text-sm font-semibold text-foreground/76 transition-colors hover:bg-card/5">
         <ChevronsUpDown className="h-4 w-4 text-foreground/45" />
         <select
           value={pageSize}
@@ -78,7 +78,7 @@ export function TravisMathewFilterBar({
           className="appearance-none border-none bg-transparent p-0 pr-2 text-sm font-semibold outline-none focus:ring-0 cursor-pointer"
         >
           {PAGE_SIZE_OPTIONS.map((value) => (
-            <option key={value} value={value} className="bg-[#1a1a1a] text-foreground">
+            <option key={value} value={value} className="bg-card text-foreground">
               {value} / page
             </option>
           ))}
@@ -87,3 +87,4 @@ export function TravisMathewFilterBar({
     </div>
   );
 }
+

@@ -74,7 +74,7 @@ export function SelectRetailerModal({ isOpen, onClose, onConfirm }: SelectRetail
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/60 backdrop-blur-sm p-4">
       <div className="w-full max-w-lg overflow-hidden rounded-[28px] bg-background shadow-2xl transition-all animate-in fade-in zoom-in duration-300">
         <div className="flex items-center justify-between border-b border-border/60 px-6 py-5">
           <h2 className="text-xl font-bold text-foreground">Select Retailer</h2>
@@ -136,7 +136,7 @@ export function SelectRetailerModal({ isOpen, onClose, onConfirm }: SelectRetail
           </button>
           <button
             onClick={handleConfirm}
-            className="rounded-2xl bg-black px-8 py-3 text-sm font-bold text-white shadow-lg hover:shadow-black/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            className="rounded-2xl bg-background px-8 py-3 text-sm font-bold text-foreground shadow-lg hover:shadow-black/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
           >
             OK
           </button>
@@ -145,3 +145,4 @@ export function SelectRetailerModal({ isOpen, onClose, onConfirm }: SelectRetail
     </div>
   );
 }
+
