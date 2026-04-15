@@ -50,15 +50,15 @@ export function ProductImage({ brandName, rowData, alt = "Product Image", classN
 
   if (!displaySrc || error) {
     return (
-      <div className={`flex items-center justify-center rounded-2xl bg-[#1D1D1D] text-white/20 ${className}`}>
-        <Package2 className="h-5 w-5 text-white" />
+      <div className={`flex items-center justify-center rounded-2xl bg-card text-foreground/20 ${className}`}>
+        <Package2 className="h-5 w-5 text-foreground" />
       </div>
     );
   }
 
   return (
     <div
-      className={`group relative cursor-pointer overflow-hidden rounded-2xl bg-[#1D1D1D] shadow-sm ring-1 ring-white/5 transition-all hover:ring-2 hover:ring-primary/50 ${className}`}
+      className={`group relative cursor-pointer overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-border/5 transition-all hover:ring-2 hover:ring-primary/50 ${className}`}
       onClick={(e) => {
         if (onClick) {
           e.stopPropagation();
@@ -74,7 +74,8 @@ export function ProductImage({ brandName, rowData, alt = "Product Image", classN
         onError={() => setError(true)}
         sizes="(max-width: 768px) 44px, 44px"
       />
-      <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
+      <div className="absolute inset-0 bg-background/0 transition-colors group-hover:bg-background/10" />
     </div>
   );
 }
+

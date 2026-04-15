@@ -101,7 +101,7 @@ export default async function OrderDetailPage({params}: {params: {id: string}}) 
               <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-foreground/45">Timeline note</span>
               <textarea name="note" rows={3} placeholder="Add approval or availability note" className="w-full rounded-2xl border border-border/70 bg-background px-4 py-3 text-sm outline-none" />
             </label>
-            <button type="submit" className="rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-white">Update order</button>
+            <button type="submit" className="rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-background">Update order</button>
           </form>
         </SectionCard>
       </div>

@@ -196,7 +196,7 @@ export default function TravisMEthewSheetTable() {
             type="checkbox"
             checked={selectedKeys.size > 0 && selectedKeys.size === filteredRows.length}
             onChange={handleToggleAll}
-            className="h-4 w-4 rounded border-white/20 bg-white/5 accent-primary"
+            className="h-4 w-4 rounded border-border/20 bg-card/5 accent-primary"
           />
         ), 
         key: "selection" as any 
@@ -251,7 +251,7 @@ export default function TravisMEthewSheetTable() {
           {hasActiveFilters && (
             <button
               onClick={handleClearFilters}
-              className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/20"
+              className="inline-flex items-center gap-2 rounded-full border border-border/10 bg-card/[0.04] px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:bg-card/[0.08]"
             >
               Clear filters
             </button>
@@ -282,7 +282,7 @@ export default function TravisMEthewSheetTable() {
           <tr>
             <td colSpan={columns.length} className="px-6 py-14 text-center">
               <div className="mx-auto flex max-w-md flex-col items-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-[22px] bg-[#1a1a1a] text-white">
+                <div className="flex h-14 w-14 items-center justify-center rounded-[22px] bg-card text-foreground">
                   <Loader2 className="h-5 w-5 animate-spin" />
                 </div>
                 <h3 className="mt-4 text-base font-semibold text-foreground">Loading Travis Mathew sheet</h3>
@@ -306,7 +306,7 @@ export default function TravisMEthewSheetTable() {
                           type="checkbox"
                           checked={selectedKeys.has(rowKey)}
                           onChange={() => handleToggleRow(rowKey)}
-                          className="h-4 w-4 rounded border-white/20 bg-white/5 accent-primary"
+                          className="h-4 w-4 rounded border-border/20 bg-card/5 accent-primary"
                         />
                       </td>
                     );
@@ -335,7 +335,7 @@ export default function TravisMEthewSheetTable() {
                             className="h-11 w-11 shadow-lg shadow-black/20"
                           />
                         ) : (
-                          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#1D1D1D] text-[10px] font-bold uppercase tracking-wider text-white/20 ring-1 ring-white/5">
+                          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-card text-[10px] font-bold uppercase tracking-wider text-foreground/20 ring-1 ring-border/5">
                             No Img
                           </div>
                         )}
@@ -368,7 +368,7 @@ export default function TravisMEthewSheetTable() {
           <tr>
             <td colSpan={columns.length} className="px-6 py-14 text-center">
               <div className="mx-auto flex max-w-md flex-col items-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-[22px] bg-[#1a1a1a] text-white">
+                <div className="flex h-14 w-14 items-center justify-center rounded-[22px] bg-card text-foreground">
                   <Package2 className="h-5 w-5" />
                 </div>
                 <h3 className="mt-4 text-base font-semibold text-foreground">No Travis Mathew rows found</h3>
@@ -383,3 +383,4 @@ export default function TravisMEthewSheetTable() {
     </section>
   );
 }
+

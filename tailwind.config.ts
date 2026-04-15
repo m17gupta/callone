@@ -12,28 +12,15 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        surface: {
-          DEFAULT: "var(--surface)",
-          muted: "var(--surface-muted)",
-          elevated: "var(--surface-elevated)",
-          strong: "var(--surface-strong)",
-        },
-        primary: {
-          DEFAULT: "var(--primary)",
-          strong: "var(--primary-strong)",
-        },
+        surface: "var(--surface)",
+        primary: "var(--primary)",
         border: "var(--border)",
         success: "var(--success)",
         danger: "var(--danger)",
-        warning: "var(--warning)",
-        muted: {
-          DEFAULT: "var(--muted)",
-          foreground: "var(--muted-foreground)",
-        },
-        accent: "var(--accent)",
       },
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
+        sans: ["var(--font-geist-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["var(--font-geist-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
       },
     },
   },

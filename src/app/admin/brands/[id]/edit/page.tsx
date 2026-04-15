@@ -56,7 +56,7 @@ export default async function EditBrandPage({params}: {params: {id: string}}) {
             Active
           </label>
           <div className="lg:col-span-2 flex justify-end">
-            <button type="submit" className="rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-white">Update brand</button>
+            <button type="submit" className="rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-background">Update brand</button>
           </div>
         </form>
       </SectionCard>

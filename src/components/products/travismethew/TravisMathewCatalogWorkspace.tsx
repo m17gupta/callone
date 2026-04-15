@@ -124,7 +124,7 @@ export function TravisMathewCatalogWorkspace() {
             }}
           />
 
-          <div className="space-y-4 px-4 py-4 bg-[#111111] bg-opacity-50">
+          <div className="space-y-4 px-4 py-4 bg-card bg-opacity-50">
             <TravisMathewFilterBar
               query={query}
               setQuery={setQuery}
@@ -146,7 +146,7 @@ export function TravisMathewCatalogWorkspace() {
         </section>
 
         <section className="premium-card overflow-clip rounded-[28px] border border-border/20">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/5 px-4 py-3 bg-[#111111]">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/5 px-4 py-3 bg-card">
             <div>
               <h3 className="text-base font-semibold text-foreground">Product List</h3>
               <p className="text-sm text-foreground/56">
@@ -161,7 +161,7 @@ export function TravisMathewCatalogWorkspace() {
             </div>
           </div>
 
-          <div className="bg-[#111111] bg-opacity-50">
+          <div className="bg-card bg-opacity-50">
             <TravisMathewTable 
               products={visibleProducts}
               selectedIds={selectedIds}
@@ -194,3 +194,4 @@ export function TravisMathewCatalogWorkspace() {
     </>
   );
 }
+

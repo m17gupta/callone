@@ -50,7 +50,7 @@ export default async function RolesPage() {
             Active
           </label>
           <div className="lg:col-span-2 flex justify-end">
-            <button type="submit" className="rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-white">Save role</button>
+            <button type="submit" className="rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-background">Save role</button>
           </div>
         </form>
       </SectionCard>

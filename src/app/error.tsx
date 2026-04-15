@@ -25,10 +25,11 @@ export default function Error({
 
       <button
         onClick={reset}
-        className="rounded-2xl bg-primary px-5 py-2 text-sm font-semibold text-white hover:bg-primary/90"
+        className="rounded-2xl bg-primary px-5 py-2 text-sm font-semibold text-foreground hover:bg-primary/90"
       >
         Try again
       </button>
     </div>
   );
 }
+

@@ -52,7 +52,7 @@ export function CatalogTable({
     <section className="flex flex-col gap-6">
       {/* Search/Filter Context is likely above this or handled elsewhere, 
           so we focus on the table container itself matching the OrderList style */}
-      <div className="overflow-hidden rounded-[32px] border border-border/40 bg-white dark:bg-[#111111] shadow-[0_15px_60px_rgba(0,0,0,0.05)] dark:shadow-[0_45px_100px_rgba(0,0,0,0.4)] transition-all duration-500">
+      <div className="overflow-hidden rounded-[32px] border border-border/40 bg-card dark:bg-card shadow-[0_15px_60px_rgba(0,0,0,0.05)] dark:shadow-[0_45px_100px_rgba(0,0,0,0.4)] transition-all duration-500">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 bg-foreground/[0.01] px-8 py-6">
           <div className="flex items-center gap-4">
             <div className="flex flex-col">
@@ -120,7 +120,7 @@ export function CatalogTable({
             <button
               onClick={() => setPage((current) => Math.max(1, current - 1))}
               disabled={currentPage === 1}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/40 bg-foreground/[0.02] text-foreground/40 transition-all hover:bg-primary hover:text-white disabled:opacity-30"
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/40 bg-foreground/[0.02] text-foreground/40 transition-all hover:bg-primary hover:text-foreground disabled:opacity-30"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
@@ -130,7 +130,7 @@ export function CatalogTable({
             <button
               onClick={() => setPage((current) => Math.min(pageCount, current + 1))}
               disabled={currentPage === pageCount}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/40 bg-foreground/[0.02] text-foreground/40 transition-all hover:bg-primary hover:text-white disabled:opacity-30"
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/40 bg-foreground/[0.02] text-foreground/40 transition-all hover:bg-primary hover:text-foreground disabled:opacity-30"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
@@ -140,3 +140,4 @@ export function CatalogTable({
     </section>
   );
 }
+

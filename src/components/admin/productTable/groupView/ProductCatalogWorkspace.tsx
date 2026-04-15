@@ -40,14 +40,14 @@ const SORT_OPTIONS = [
 
 function statusClasses(status: string) {
   if (status === "active") {
-    return "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300";
+    return "border-border/10 bg-background/30 text-foreground";
   }
 
   if (status === "draft") {
-    return "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-300";
+    return "border-border/10 bg-background/20 text-foreground/70";
   }
 
-  return "border-white/10 bg-white/6 text-foreground/70";
+  return "border-border/10 bg-background/20 text-foreground/70";
 }
 
 
@@ -631,7 +631,7 @@ export function ProductCatalogWorkspace({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 z-50 flex items-center justify-center rounded-3xl border border-white/10 bg-black/20 backdrop-blur-[2px] transition-all"
+              className="absolute inset-0 z-50 flex items-center justify-center rounded-3xl border border-border/10 bg-background/20 backdrop-blur-[2px] transition-all"
             >
               <div className="flex flex-col items-center gap-4">
                 <div className="relative flex h-16 w-16 items-center justify-center">
@@ -639,8 +639,8 @@ export function ProductCatalogWorkspace({
                   <div className="h-2 w-2 animate-ping rounded-full bg-primary"></div>
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="text-sm font-bold uppercase tracking-widest text-white">Loading product please wait ...</span>
-                  <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-white/40">Synchronizing data...</span>
+                  <span className="text-sm font-bold uppercase tracking-widest text-foreground">Loading product please wait ...</span>
+                  <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-foreground/40">Synchronizing data...</span>
                 </div>
               </div>
             </motion.div>
@@ -673,18 +673,18 @@ export function ProductCatalogWorkspace({
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 100 }}
-            className="fixed bottom-0 left-0 right-0 z-[100] border-t border-white/10 bg-black px-6 py-4 text-white shadow-[0_-10px_40px_rgba(0,0,0,0.5)]"
+            className="fixed bottom-0 left-0 right-0 z-[100] border-t border-border/10 bg-background px-6 py-4 text-foreground shadow-[0_-10px_40px_rgba(0,0,0,0.5)]"
           >
             <div className="mx-auto flex max-w-screen-2xl items-center justify-between gap-6">
               <div className="flex items-center gap-6">
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">Actions for</span>
-                  <span className="text-sm font-black uppercase tracking-widest text-primary">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/50">Actions for</span>
+                  <span className="text-sm font-black uppercase tracking-widest text-foreground">
                     {selectedIds.length} items selected
                   </span>
                 </div>
-                <div className="h-8 w-px bg-white/10" />
-                <p className="hidden text-xs font-semibold text-white/40 lg:block">
+                <div className="h-8 w-px bg-card/10" />
+                <p className="hidden text-xs font-semibold text-foreground/40 lg:block">
                   Bulk export, quantity updates, and inventory management for the current selection.
                 </p>
               </div>
@@ -692,11 +692,11 @@ export function ProductCatalogWorkspace({
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setSelectedIds([])}
-                  className="rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all hover:bg-white/10 hover:text-white"
+                  className="rounded-xl border border-border/10 bg-background/30 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-foreground transition-all hover:bg-background/40 hover:text-foreground"
                 >
                   Clear Selection
                 </button>
-                <div className="h-8 w-px bg-white/10" />
+                <div className="h-8 w-px bg-card/10" />
                 <ProductExportActions
                   selectedProducts={selectedProducts}
                   selectedIds={selectedIds}
@@ -713,17 +713,17 @@ export function ProductCatalogWorkspace({
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            className="sticky bottom-4 z-30 mx-auto flex w-full max-w-[400px] items-center justify-between gap-3 rounded-[24px] border border-primary/20 bg-primary px-6 py-4 text-white shadow-[0_20px_50px_rgba(15,132,255,0.3)]"
+              className="sticky bottom-4 z-30 mx-auto flex w-full max-w-[400px] items-center justify-between gap-3 rounded-[24px] border border-border/10 bg-background px-6 py-4 text-foreground shadow-[0_20px_50px_rgba(0,0,0,0.18)]"
           >
             <div className="flex flex-col">
-              <span className="text-xs font-bold uppercase tracking-wider opacity-80">Ready to add</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-foreground/80">Ready to add</span>
               <span className="text-sm font-semibold">
                 {Object.values(skuQuantities).filter(q => (q.qty88 ?? 0) > 0 || (q.qty90 ?? 0) > 0).length} items selected
               </span>
             </div>
             <button
               onClick={handleAddToCart}
-              className="rounded-xl bg-white px-5 py-2 text-sm font-bold text-primary shadow-sm hover:bg-white/90 transition-colors"
+              className="rounded-xl bg-background px-5 py-2 text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-background/80"
             >
               Add to Cart
             </button>
@@ -752,3 +752,4 @@ export function ProductCatalogWorkspace({
     </>
   );
 }
+

@@ -33,7 +33,7 @@ export function ProductTable({
   return (
     <table className="min-w-full border-separate border-spacing-0 text-left text-sm">
       <thead>
-        <tr className="bg-[#111111] text-white">
+        <tr className="bg-background text-foreground">
           <StickyHeading className="w-12 px-4 py-3">
             <input
               type="checkbox"
@@ -50,7 +50,7 @@ export function ProductTable({
                   );
                 }
               }}
-              className="h-4 w-4 rounded border-white/20 bg-transparent"
+              className="h-4 w-4 rounded border-border/20 bg-transparent"
             />
           </StickyHeading>
           <StickyHeading className="min-w-[320px] px-4 py-3">Product</StickyHeading>
@@ -68,7 +68,7 @@ export function ProductTable({
           visibleRows.map((row) => {
             const isSelected = selectedIds.includes(row.rowKey);
             return (
-              <tr key={row.rowKey} className="border-b border-border/60 transition-colors hover:bg-primary/5">
+              <tr key={row.rowKey} className="border-b border-border/60 transition-colors hover:bg-card/[0.04]">
                 <td className="border-b border-border/60 px-4 py-4 align-top">
                   <input
                     type="checkbox"
@@ -187,12 +187,12 @@ export function ProductTable({
                     <div className="group relative">
                       <Link
                         href={`/admin/products/${row.id}/edit`}
-                        className="flex h-9 w-9 items-center justify-center rounded-xl border border-primary/10 bg-primary/4 text-primary transition-all hover:bg-primary hover:text-white"
+                        className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/10 bg-card/[0.04] text-foreground/80 transition-all hover:bg-card/[0.08] hover:text-foreground"
                       >
                         <Pencil className="h-4 w-4" />
                       </Link>
                       {/* Tooltip */}
-                      <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-black/80 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white opacity-0 transition-all group-hover:opacity-100">
+                      <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-background/80 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-foreground opacity-0 transition-all group-hover:opacity-100">
                         Edit Product
                         <div className="absolute top-full left-1/2 h-1 w-1 -translate-x-1/2 border-x-4 border-t-4 border-x-transparent border-t-black/80" />
                       </div>
@@ -202,7 +202,7 @@ export function ProductTable({
                       <button
                         onClick={() => handleDelete(row.id)}
                         disabled={deletingId === row.id}
-                        className="flex h-9 w-9 items-center justify-center rounded-xl border border-danger/10 bg-danger/4 text-danger transition-all hover:bg-danger hover:text-white disabled:opacity-50 disabled:hover:bg-danger/4 disabled:hover:text-danger"
+                        className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/10 bg-card/[0.04] text-foreground/80 transition-all hover:bg-card/[0.08] hover:text-foreground disabled:opacity-50 disabled:hover:bg-card/[0.04] disabled:hover:text-foreground/80"
                       >
                         {deletingId === row.id ? (
                           <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -211,9 +211,9 @@ export function ProductTable({
                         )}
                       </button>
                       {/* Tooltip */}
-                      <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-red-600 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white opacity-0 transition-all group-hover:opacity-100">
+                      <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-background/80 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-foreground opacity-0 transition-all group-hover:opacity-100">
                         {deletingId === row.id ? "Deleting..." : "Delete Product"}
-                        <div className="absolute top-full left-1/2 h-1 w-1 -translate-x-1/2 border-x-4 border-t-4 border-x-transparent border-t-red-600" />
+                        <div className="absolute top-full left-1/2 h-1 w-1 -translate-x-1/2 border-x-4 border-t-4 border-x-transparent border-t-black/80" />
                       </div>
                     </div>
                   </div>
@@ -225,7 +225,7 @@ export function ProductTable({
           <tr>
             <td colSpan={9} className="px-6 py-14 text-center">
               <div className="mx-auto flex max-w-md flex-col items-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-[22px] bg-[#111111] text-white">
+                <div className="flex h-14 w-14 items-center justify-center rounded-[22px] bg-card text-foreground">
                   <Package2 className="h-5 w-5" />
                 </div>
                 <h3 className="mt-4 text-base font-semibold text-foreground">No products found</h3>
@@ -250,16 +250,17 @@ function StickyHeading({
 }) {
   return (
     <th
-      className={`bg-[#111] text-white shadow-[0_1px_0_rgba(255,255,255,0.08)]  ${className || ""}`}
+      className={`bg-card text-foreground shadow-[0_1px_0_rgba(255,255,255,0.08)]  ${className || ""}`}
       style={{
         position: "sticky",
         top: 0,
         zIndex: 20,
       }}
     >
-      <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/82">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/82">
         {children}
       </div>
     </th>
   );
 }
+

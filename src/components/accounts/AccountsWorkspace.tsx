@@ -126,7 +126,7 @@ export function AccountsWorkspace({
               onClick={() => setShowForm(!showForm)}
               className={`flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold transition-all ${showForm
                   ? "bg-danger/10 text-danger hover:bg-danger/15"
-                  : "bg-primary text-white shadow-[0_12px_25px_rgba(15,132,255,0.3)] hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(15,132,255,0.4)]"
+                  : "bg-primary text-foreground shadow-[0_12px_25px_rgba(15,132,255,0.3)] hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(15,132,255,0.4)]"
                 }`}
             >
               {showForm ? (
@@ -238,3 +238,4 @@ function AccountSummary({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+

@@ -155,7 +155,7 @@ export function FloatingFilterPopup({ columnKey, currentFilter, onFilterChange }
           >
             <div className="space-y-4">
               <div>
-                <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/40">Operation</label>
+                <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-foreground/40">Operation</label>
                 <select
                   value={tempOperator}
                   onChange={(e) => setTempOperator(e.target.value as FilterOperator)}
@@ -168,9 +168,9 @@ export function FloatingFilterPopup({ columnKey, currentFilter, onFilterChange }
               </div>
 
               <div>
-                <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/40">Value</label>
+                <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-foreground/40">Value</label>
                 <div className="relative">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/20" />
                   <input
                     autoFocus
                     value={tempValue}
@@ -185,13 +185,13 @@ export function FloatingFilterPopup({ columnKey, currentFilter, onFilterChange }
               <div className="flex items-center justify-end gap-2 pt-2">
                 <button
                   onClick={handleReset}
-                  className="rounded-lg px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white/40 hover:bg-white/5 hover:text-white"
+                  className="rounded-lg px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-foreground/40 hover:bg-card/5 hover:text-foreground"
                 >
                   Reset
                 </button>
                 <button
                   onClick={handleApply}
-                  className="rounded-lg bg-primary px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
+                  className="rounded-lg bg-primary px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider text-foreground transition-opacity hover:opacity-90"
                 >
                   Apply
                 </button>
@@ -203,3 +203,4 @@ export function FloatingFilterPopup({ columnKey, currentFilter, onFilterChange }
     </div>
   );
 }
+

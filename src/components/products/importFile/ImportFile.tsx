@@ -200,7 +200,7 @@ export default function ImportFile({isOpen,onClose}:Props) {
 
       <AnimatePresence>
         {isOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/50 p-4 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -271,7 +271,7 @@ export default function ImportFile({isOpen,onClose}:Props) {
                 <button
                   onClick={handleImport}
                   disabled={!file || !importProduct.length || status === 'uploading'}
-                  className="rounded-2xl bg-primary px-5 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(47,127,244,0.22)] transition-all hover:bg-primary/90 disabled:shadow-none disabled:opacity-50"
+                  className="rounded-2xl bg-primary px-5 py-2 text-sm font-semibold text-foreground shadow-[0_12px_24px_rgba(47,127,244,0.22)] transition-all hover:bg-primary/90 disabled:shadow-none disabled:opacity-50"
                 >
                   {status === 'uploading' ? 'Importing...' : 'Import Data'}
                 </button>
@@ -283,3 +283,4 @@ export default function ImportFile({isOpen,onClose}:Props) {
     </>
   );
 }
+
