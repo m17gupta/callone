@@ -108,6 +108,8 @@ export function AdminShell({children, user}: AdminShellProps) {
   ];
 
   const isWideWorkspace =
+    pathname === "/admin" ||
+    pathname === "/admin/analytics" ||
     pathname.startsWith("/admin/products/brand") ||
     pathname === "/admin/orders" ||
     pathname.startsWith("/admin/orders/") ||
@@ -185,7 +187,7 @@ export function AdminShell({children, user}: AdminShellProps) {
         <MegaSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} role={viewRole} />
 
         <header className="header-shell sticky inset-x-0 top-0 z-[1000] border-b">
-          <div className="mx-auto flex h-[var(--admin-header-height)] items-center justify-between gap-4 px-6 sm:px-10">
+          <div className="mx-auto flex h-[var(--admin-header-height)] items-center justify-between gap-4 px-4 sm:px-6">
             {/* Logo Section */}
             <div className="flex items-center gap-6">
               <button
@@ -201,7 +203,7 @@ export function AdminShell({children, user}: AdminShellProps) {
                     alt="Callaway"
                     width={80}
                     height={44}
-                    className="h-auto w-full object-contain dark:brightness-100 dark:invert-0 brightness-0 invert transition-all"
+                    className="h-auto w-full object-contain dark:invert-0 invert transition-all"
                     priority
                   />
                 </div>
@@ -256,21 +258,24 @@ export function AdminShell({children, user}: AdminShellProps) {
                               <p className="text-xs font-bold uppercase tracking-wider text-muted">{item.label}</p>
                             </div>
                             <div className="mt-3 space-y-2">
-                              {submenuItems.map((sub) => (
-                                <Link
-                                  key={sub.id}
-                                  href={sub.href}
-                                  className="flex items-start gap-4 rounded-[20px] p-3 transition hover:bg-surface-muted"
-                                >
-                                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-border bg-surface-muted text-foreground">
-                                    <sub.icon size={16} />
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-bold text-foreground">{sub.label}</p>
-                                    <p className="mt-1 text-xs text-muted">{sub.description}</p>
-                                  </div>
-                                </Link>
-                              ))}
+                              {submenuItems.map((sub) => {
+                                const SubIcon = sub.icon;
+                                return (
+                                  <Link
+                                    key={sub.id}
+                                    href={sub.href}
+                                    className="flex items-start gap-4 rounded-[20px] p-3 transition hover:bg-surface-muted"
+                                  >
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-border bg-surface-muted text-foreground">
+                                      {SubIcon ? <SubIcon size={16} /> : <Grid2x2 size={16} />}
+                                    </div>
+                                    <div className="min-w-0">
+                                      <p className="text-sm font-bold text-foreground">{sub.label}</p>
+                                      <p className="mt-1 text-xs text-muted">{sub.description}</p>
+                                    </div>
+                                  </Link>
+                                );
+                              })}
                             </div>
                           </motion.div>
                         ) : null}
@@ -323,17 +328,17 @@ export function AdminShell({children, user}: AdminShellProps) {
                 )}
               </Link>
 
-              <ThemeToggle className="header-control h-9 w-9 rounded-lg border flex items-center justify-center" />
+              <ThemeToggle className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-foreground text-background transition-all hover:scale-105 hover:bg-foreground/90 shadow-sm" />
 
               <div className="relative" ref={profileMenuRef}>
                 <button
                   onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                  className="header-control flex h-9 items-center gap-2 rounded-lg border pl-1 pr-2 transition"
+                  className="flex h-9 items-center gap-2 rounded-[14px] bg-foreground text-background pl-3 pr-2.5 transition-all hover:opacity-90 shadow-sm"
                 >
-                  <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[color:var(--header-pill-active-bg)] text-[10px] font-bold text-[color:var(--header-pill-active-fg)]">
+                  <div className="text-[12px] font-black tracking-widest">
                     {getInitials(user.name)}
                   </div>
-                  <ChevronDown size={14} className={clsx("transition-transform", profileMenuOpen && "rotate-180")} />
+                  <ChevronDown size={14} strokeWidth={3} className={clsx("transition-transform text-background/70", profileMenuOpen && "rotate-180")} />
                 </button>
 
                 <AnimatePresence>
@@ -365,6 +370,63 @@ export function AdminShell({children, user}: AdminShellProps) {
           </div>
         </header>
 
+        {/* Mobile Menu Overlay */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <>
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setMobileMenuOpen(false)}
+                className="fixed inset-0 z-[2000] bg-black/60 backdrop-blur-sm md:hidden" 
+              />
+              <motion.div 
+                initial={{ x: "-100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "-100%" }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                className="fixed inset-y-0 left-0 z-[2001] w-[300px] bg-[color:var(--surface)] p-6 shadow-2xl md:hidden"
+              >
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex h-9 w-20 items-center justify-center rounded-lg border bg-surface-muted px-2">
+                    <Image
+                      src="/images/brands/callaway-logo-white.png"
+                      alt="Callaway"
+                      width={60}
+                      height={30}
+                      className="h-auto w-full object-contain dark:invert-0 invert"
+                    />
+                  </div>
+                  <button onClick={() => setMobileMenuOpen(false)} className="rounded-lg border p-2">
+                    <X size={20} />
+                  </button>
+                </div>
+                
+                <nav className="space-y-2">
+                  {visibleNavItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = matchesPath(pathname, item.href);
+                    return (
+                      <Link
+                        key={item.id}
+                        href={item.href}
+                        className={clsx(
+                          "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all",
+                          isActive ? "bg-foreground text-background" : "text-muted hover:bg-surface-muted"
+                        )}
+                      >
+                        {Icon && <Icon size={18} />}
+                        {item.label}
+                      </Link>
+                    )
+                  })}
+                </nav>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
         <div className="relative">
           <div className="relative h-[240px] overflow-hidden bg-black">
             <AnimatePresence mode="wait">
@@ -379,16 +441,16 @@ export function AdminShell({children, user}: AdminShellProps) {
                   backgroundImage: `url(${activeHeroSlide.image})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center 25%",
-                  filter: "brightness(0.95) contrast(1.05)",
+                  filter: "contrast(1.05)",
                 }}
               />
             </AnimatePresence>
             {/* Soft Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[color:var(--background)] via-[color:var(--background)]/40 to-transparent" />
+            <div className="absolute inset-0 bg-background/40 dark:bg-background/60" />
+            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background via-background/60 to-transparent" />
           </div>
 
-          <main className={clsx("relative z-10 px-6 pb-20 sm:px-10", contentLiftClass)}>
+          <main className={clsx("relative z-10 px-4 pb-20 sm:px-5", contentLiftClass)}>
             <div className={clsx("mx-auto", shellWidthClass)}>
               {children}
             </div>

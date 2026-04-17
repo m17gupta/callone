@@ -122,12 +122,13 @@ export default async function AnalyticsPage() {
           title="Weekly order value"
           description="Value trend across the last eight weeks."
           points={insights.weeklyOrderValue}
-          formatter={(value) => money.format(value)}
+          formatType="currency"
         />
         <TrendCard
           title="Weekly order count"
           description="Volume trend across the same period."
           points={orderCountTrend}
+          formatType="number"
         />
       </div>
 

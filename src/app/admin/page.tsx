@@ -80,10 +80,10 @@ export default function AdminDashboardPage() {
       <section className="space-y-6">
         <div className="flex flex-wrap items-end justify-between gap-6 px-1 pt-2">
           <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted">
+            <p className="text-[11px] font-black uppercase tracking-[0.3em] text-foreground/80 drop-shadow-md">
               Live intelligence
             </p>
-            <h1 className="text-4xl font-black tracking-tight text-foreground">
+            <h1 className="text-4xl font-black tracking-tight text-foreground drop-shadow-md">
               Performance Matrix
             </h1>
           </div>
@@ -249,6 +249,53 @@ export default function AdminDashboardPage() {
           </>
         )}
       </section>
+
+      <div className="grid gap-8 xl:grid-cols-[1.25fr_0.75fr]">
+        <TrendCard
+          title="Weekly Revenue Flow"
+          description="Gross order value movement across the last trailing 8 weeks."
+          points={data.weeklyOrderValue || []}
+          formatType="currency"
+        />
+        <BreakdownCard
+          title="Workflow Pipeline"
+          description="Distribution of orders by their current processing stage."
+          items={data.workflowBreakdown || []}
+        />
+      </div>
+
+      <div className="grid gap-8 xl:grid-cols-[0.95fr_1.05fr]">
+        <BrandCatalogCard
+          title="Brand Intelligence"
+          description="High-level catalog footprint and real-time inventory depth per brand."
+          items={brandCatalog}
+        />
+        <LeaderboardCard
+          title="Product Velocity"
+          description="Performance ranking of items based on unit demand and contribution."
+          items={topProducts}
+          valuePrefix=""
+        />
+      </div>
+
+      <div className="grid gap-8 xl:grid-cols-3">
+        <BreakdownCard
+          title="Hub Distribution"
+          description="Regional inventory availability across active fulfillment centers."
+          items={data.warehouseBreakdown || []}
+        />
+        <BreakdownCard
+          title="Role Utilization"
+          description="Personnel bandwidth and active account distribution."
+          items={data.roleDistribution || []}
+        />
+        <LeaderboardCard
+          title="Peak Performers"
+          description="Individual contributors driving the highest revenue results."
+          items={data.topContributors || []}
+          valuePrefix=""
+        />
+      </div>
     </div>
   );
 }
