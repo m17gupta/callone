@@ -2,20 +2,29 @@
 
 import React from "react";
 import type {BreakdownItem, BrandCatalogInsight, LeaderboardItem, TrendPoint} from "@/lib/admin/insights";
+import { Grid2x2 } from "lucide-react";
 
 function currency(value: number) {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(value);
+  try {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(value || 0);
+  } catch (e) {
+    return "₹0";
+  }
 }
 
 function compactNumber(value: number) {
-  return new Intl.NumberFormat("en-IN", {
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(value);
+  try {
+    return new Intl.NumberFormat("en-IN", {
+      notation: "compact",
+      maximumFractionDigits: 1,
+    }).format(value || 0);
+  } catch (e) {
+    return "0";
+  }
 }
 
 export function InsightMetricCard({
@@ -48,10 +57,10 @@ export function InsightMetricCard({
       <div className="flex items-start justify-between relative z-10">
         <div className="space-y-1.5">
           <p className={`text-[11px] font-bold uppercase tracking-[0.16em] ${mutedClass}`}>
-            {label}
+            {label || "Metric"}
           </p>
           <p className={`text-3xl font-black tracking-tight ${textClass} sm:text-4xl`}>
-            {value}
+            {value || "0"}
           </p>
         </div>
         {(Icon || image) && (
@@ -69,7 +78,7 @@ export function InsightMetricCard({
           </div>
         )}
       </div>
-      <p className={`mt-4 text-xs font-medium leading-relaxed opacity-80 relative z-10 ${mutedClass}`}>{detail}</p>
+      <p className={`mt-4 text-xs font-medium leading-relaxed opacity-80 relative z-10 ${mutedClass}`}>{detail || ""}</p>
     </div>
   );
 }
@@ -78,14 +87,18 @@ export function TrendCard({
   title,
   description,
   points,
-  formatter = compactNumber,
+  formatter,
+  formatType = "compact",
 }: {
   title: string;
   description: string;
   points: TrendPoint[];
   formatter?: (value: number) => string;
+  formatType?: "currency" | "compact" | "number";
 }) {
-  if (!points || points.length === 0) {
+  const safePoints = points || [];
+  
+  if (safePoints.length === 0) {
     return (
       <div className="premium-card rounded-[28px] p-6">
         <p className="text-base font-semibold tracking-tight text-foreground">{title}</p>
@@ -96,8 +109,8 @@ export function TrendCard({
     );
   }
 
-  const maxValue = Math.max(...points.map((point) => point.value || 0), 1);
-  const stepX = points.length > 1 ? 100 / (points.length - 1) : 100;
+  const maxValue = Math.max(...safePoints.map((point) => point.value || 0), 1);
+  const stepX = safePoints.length > 1 ? 100 / (safePoints.length - 1) : 100;
 
   const generateSmoothPath = (pts: TrendPoint[]) => {
     if (!pts || pts.length < 2) return "";
@@ -106,28 +119,28 @@ export function TrendCard({
       const y = 72 - ((pt.value || 0) / maxValue) * 62;
       if (i === 0) return `M 0,${y}`;
       const px = (i - 1) * stepX;
-      const py = 72 - ((pts[i - 1].value || 0) / maxValue) * 62;
+      const py = 72 - ((pts[i - 1]?.value || 0) / maxValue) * 62;
       return `${acc} C ${(px + x) / 2},${py} ${(px + x) / 2},${y} ${x},${y}`;
     }, "");
   };
 
-  const linePath = generateSmoothPath(points);
+  const linePath = generateSmoothPath(safePoints);
   const areaPath = linePath ? `${linePath} L 100,72 L 0,72 Z` : "";
-  const gradientId = `trend-fill-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+  const gradientId = `trend-fill-${(title || "trend").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 
   return (
-    <div className="premium-card rounded-[28px] p-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <div className="premium-card rounded-[28px] p-6 relative overflow-hidden">
+      <div className="flex flex-wrap items-start justify-between gap-3 relative z-10">
         <div>
           <p className="text-base font-semibold tracking-tight text-foreground">{title}</p>
           <p className="mt-1 text-sm text-foreground/62">{description}</p>
         </div>
         <div className="rounded-full border border-border/20 bg-foreground/[0.04] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-foreground/52">
-          Last {points.length} weeks
+          Last {safePoints.length} weeks
         </div>
       </div>
 
-      <div className="mt-5 overflow-hidden rounded-[24px] border border-border/12 bg-surface-muted/30 p-5">
+      <div className="mt-5 overflow-hidden rounded-[24px] border border-border/12 bg-surface-muted/30 p-5 relative z-10">
         <svg viewBox="0 0 100 76" className="h-52 w-full">
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
@@ -135,28 +148,39 @@ export function TrendCard({
               <stop offset="100%" stopColor="#2DD4BF" stopOpacity="0" />
             </linearGradient>
           </defs>
-          <path d={areaPath} fill={`url(#${gradientId})`} />
-          <path
-            d={linePath}
-            fill="none"
-            stroke="#2DD4BF"
-            strokeWidth="2.5"
-            strokeLinejoin="round"
-            strokeLinecap="round"
-          />
+          {areaPath && <path d={areaPath} fill={`url(#${gradientId})`} />}
+          {linePath && (
+            <path
+              d={linePath}
+              fill="none"
+              stroke="#2DD4BF"
+              strokeWidth="2.5"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+          )}
         </svg>
 
         <div className="mt-3 grid gap-2 md:grid-cols-4 xl:grid-cols-8">
-          {points.map((point) => (
-            <div key={point.label} className="rounded-xl border border-border bg-surface-muted/50 px-3 py-2 text-center transition-all hover:bg-surface-elevated">
+          {safePoints.map((point, idx) => {
+            const displayValue = formatter 
+              ? formatter(point.value || 0) 
+              : formatType === "currency" 
+                ? currency(point.value || 0) 
+                : formatType === "compact" 
+                  ? compactNumber(point.value || 0) 
+                  : point.value || 0;
+            return (
+            <div key={`${point.label}-${idx}`} className="rounded-xl border border-border bg-surface-muted/50 px-3 py-2 text-center transition-all hover:bg-surface-elevated">
               <p className="text-[10px] font-bold uppercase tracking-wider text-muted">
-                {point.label}
+                {point.label || `W${idx+1}`}
               </p>
               <p className="mt-1 text-base font-bold text-foreground">
-                {formatter ? formatter(point.value) : point.value}
+                {displayValue}
               </p>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
@@ -172,7 +196,8 @@ export function BreakdownCard({
   description: string;
   items: BreakdownItem[];
 }) {
-  const maxValue = Math.max(...items.map((item) => item.value), 1);
+  const safeItems = items || [];
+  const maxValue = Math.max(...safeItems.map((item) => item.value || 0), 1);
 
   return (
     <div className="premium-card rounded-[28px] p-6">
@@ -180,21 +205,21 @@ export function BreakdownCard({
       <p className="mt-1 text-sm text-foreground/62">{description}</p>
 
       <div className="mt-5 space-y-3">
-        {items.length ? (
-          items.map((item) => (
-            <div key={item.label} className="rounded-xl border border-border bg-surface px-4 py-3 transition duration-300 hover:bg-surface-muted">
+        {safeItems.length ? (
+          safeItems.map((item, idx) => (
+            <div key={`${item.label}-${idx}`} className="rounded-xl border border-border bg-surface px-4 py-3 transition duration-300 hover:bg-surface-muted">
               <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-xs font-bold uppercase tracking-wider text-muted">{item.label}</p>
                 </div>
                 <span className="text-base font-bold text-foreground">
-                  {item.value}
+                  {item.value || 0}
                 </span>
               </div>
               <div className="mt-2.5 h-1.5 rounded-full bg-foreground/5 overflow-hidden">
                 <div
                   className="h-full rounded-full bg-[#2DD4BF] transition-all duration-1000"
-                  style={{width: `${(item.value / maxValue) * 100}%`}}
+                  style={{width: `${((item.value || 0) / maxValue) * 100}%`}}
                 />
               </div>
             </div>
@@ -222,19 +247,21 @@ export function LeaderboardCard({
   valuePrefix?: string;
   showCurrency?: boolean;
 }) {
+  const safeItems = items || [];
+  
   return (
     <div className="premium-card rounded-[28px] p-6">
       <p className="text-base font-semibold tracking-tight text-foreground">{title}</p>
       <p className="mt-1 text-sm text-foreground/62">{description}</p>
 
       <div className="mt-5 space-y-3">
-        {items.length ? (
-          items.map((item, index) => (
+        {safeItems.length ? (
+          safeItems.map((item, index) => (
             <div key={`${item.label}-${index}`} className="rounded-xl border border-border bg-surface px-4 py-4 transition duration-300 hover:bg-surface-muted">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <p className="truncate text-xs font-bold uppercase tracking-wider text-muted">{item.label}</p>
-                  <p className="mt-1 text-sm font-semibold text-foreground">{item.sublabel}</p>
+                  <p className="truncate text-xs font-bold uppercase tracking-wider text-muted">{item.label || "Unknown"}</p>
+                  <p className="mt-1 text-sm font-semibold text-foreground">{item.sublabel || ""}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-base font-bold text-foreground">
@@ -266,27 +293,29 @@ export function BrandCatalogCard({
   description: string;
   items: BrandCatalogInsight[];
 }) {
+  const safeItems = items || [];
+
   return (
     <div className="premium-card rounded-[28px] p-6">
       <p className="text-base font-semibold tracking-tight text-foreground">{title}</p>
       <p className="mt-1 text-sm text-foreground/62">{description}</p>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-2">
-        {items.length ? (
-          items.map((item) => (
-            <div key={item.label} className="rounded-xl border border-border bg-surface p-4 transition duration-300 hover:bg-surface-muted">
+        {safeItems.length ? (
+          safeItems.map((item, idx) => (
+            <div key={`${item.label}-${idx}`} className="rounded-xl border border-border bg-surface p-4 transition duration-300 hover:bg-surface-muted">
               <p className="text-xs font-bold uppercase tracking-wider text-muted pb-3 border-b border-border/10 mb-4">{item.label}</p>
               <div className="grid grid-cols-3 gap-0 text-center">
                 <div className="px-1">
-                  <p className="text-base font-black tracking-tighter text-foreground sm:text-lg">{item.products}</p>
+                  <p className="text-base font-black tracking-tighter text-foreground sm:text-lg">{item.products || 0}</p>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-muted/60 mt-0.5">Items</p>
                 </div>
                 <div className="px-1 border-x border-border/10">
-                  <p className="text-base font-black tracking-tighter text-foreground sm:text-lg">{item.variants}</p>
+                  <p className="text-base font-black tracking-tighter text-foreground sm:text-lg">{item.variants || 0}</p>
                   <p className="text-[9px] font-bold uppercase tracking-wider text-muted/60 mt-0.5">SKUs</p>
                 </div>
                 <div className="px-1">
-                  <p className="text-base font-black tracking-tighter text-foreground sm:text-lg">{item.stock}</p>
+                  <p className="text-base font-black tracking-tighter text-foreground sm:text-lg">{item.stock || 0}</p>
                   <p className="text-[9px] font-bold uppercase tracking-wider text-muted/60 mt-0.5">Stock</p>
                 </div>
               </div>

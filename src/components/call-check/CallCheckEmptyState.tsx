@@ -45,7 +45,7 @@ export function CallCheckEmptyState({
                 type="button"
                 onClick={onOpenFile}
                 disabled={isLoading}
-                className="inline-flex items-center gap-2 rounded-[20px] bg-primary px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-[20px] bg-primary px-5 py-3 text-sm font-semibold text-background disabled:opacity-60"
               >
                 {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
