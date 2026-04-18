@@ -2,7 +2,7 @@
 import { AppDispatch, RootState } from "@/store";
 import { setCurrentAttribute } from "@/store/slices/attributeSlice/attributeSlice";
 import { usePathname } from "next/navigation";
-import React, { useEffect, useRef } from "react";
+import  { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const CurrentAttribute = () => {
