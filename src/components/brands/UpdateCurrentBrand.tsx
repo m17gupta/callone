@@ -13,11 +13,12 @@ const UpdateCurrentBrand = () => {
     const { isFetchedBrand, allBrand } = useSelector((state: RootState) => state.brand)
     const pathanme = usePathname()
     const brandName = pathanme.split("/")[4]
-
+  console.log("brandName pathname ",brandName)
     useEffect(() => {
-        if (allBrand && !isApi.current && brandName) {
+        if (allBrand && brandName) {
             if (brandName === "travis-mathew") {
                 const brand = allBrand.find((brand) => brand?.name === "Travis Mathew")
+                console.log("brand ANme ",brand)
                 if (brand) {
                     dispatch(setCurrentBrand(brand))
                 }
@@ -43,7 +44,7 @@ const UpdateCurrentBrand = () => {
                     dispatch(setCurrentBrand(brand))
                 }
 
-                isApi.current = true
+                
             }
 
             //   dispatch(updateBrand())

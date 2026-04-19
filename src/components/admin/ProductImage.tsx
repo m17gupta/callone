@@ -18,9 +18,10 @@ export function ProductImage({ brandName, rowData, alt = "Product Image", classN
 
   const s3_url = `https://callaways3bucketcc001-prod.s3.ap-south-1.amazonaws.com/public/productimg/TRAVIS-Images`;
   const s3_url_ogio = `https://callaways3bucketcc001-prod.s3.ap-south-1.amazonaws.com/public/productimg/OGIO-Images`;
-
+   console.log("brandName", brandName , rowData?.sku)
   useEffect(() => {
     // Get the raw image source and filename
+
     const rawUrl = rowData?.primary_url || rowData?.primary_image_url;
     const skuValue = rowData?.sku || rowData?.baseSku;
 
@@ -34,7 +35,9 @@ export function ProductImage({ brandName, rowData, alt = "Product Image", classN
 
     // 2. Otherwise treatment as a filename and construct S3 URL based on brand
     if (brandName === "Travis Mathew" && typeof skuValue === "string") {
-      const fam = skuValue.replace(/_[^_]*$/, '');
+      // If we have a specific SKU, we strip the last part to get the family.
+      // If we only have baseSku (likely Group View), the baseSku itself IS the family.
+      const fam = rowData?.sku ? skuValue.replace(/_[^_]*$/, '') : skuValue;
       const path = `${s3_url}/${fam}/${rawUrl}`;
       setPrimaryImage(path);
     } else if (brandName === "Ogio" && typeof skuValue === "string") {
@@ -46,7 +49,7 @@ export function ProductImage({ brandName, rowData, alt = "Product Image", classN
   }, [brandName, rowData, s3_url, s3_url_ogio]);
 
   const displaySrc = primaryImage;
-
+   console.log("displaySrc",displaySrc)
 
   if (!displaySrc || error) {
     return (

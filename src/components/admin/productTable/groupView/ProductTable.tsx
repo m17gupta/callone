@@ -2,7 +2,9 @@
 
 import React from "react";
 import Link from "next/link";
-import { Package2, Pencil, Trash2 } from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { Package2, Pencil, Trash2, ShoppingCart } from "lucide-react";
 import { ProductImage } from "../../ProductImage";
 
 interface ProductTableProps {
@@ -28,6 +30,7 @@ export function ProductTable({
   statusClasses,
   onOpenPreview,
 }: ProductTableProps) {
+  const { items } = useSelector((state: RootState) => state.cart);
 
 
   return (
@@ -59,6 +62,7 @@ export function ProductTable({
           <StickyHeading className="min-w-[260px] px-4 py-3">Attributes</StickyHeading>
           <StickyHeading className="min-w-[180px] px-4 py-3">Variants</StickyHeading>
           <StickyHeading className="min-w-[140px] px-4 py-3">Stock</StickyHeading>
+          <StickyHeading className="min-w-[140px] px-4 py-3">Selected</StickyHeading>
           <StickyHeading className="min-w-[130px] px-4 py-3">Status</StickyHeading>
           <StickyHeading className="min-w-[120px] px-4 py-3">Actions</StickyHeading>
         </tr>
@@ -101,7 +105,8 @@ export function ProductTable({
                           if (url.startsWith('http') || url.startsWith('/')) return url;
 
                           if (row.brand.name === "Travis Mathew") {
-                            const fam = skuValue?.replace(/_[^_]*$/, '') || '';
+                            // In Group View, baseSku is the family identifier
+                            const fam = row.sku ? skuValue?.replace(/_[^_]*$/, '') : skuValue;
                             return `${s3_url}/${fam}/${url}`;
                           } else if (row.brand.name === "Ogio") {
                             return `${s3_url_ogio}/${skuValue}/${url}`;
@@ -120,8 +125,8 @@ export function ProductTable({
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="truncate font-semibold text-foreground">{row.name}</p>
-                        <span className="rounded-full border border-border/70 bg-background px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-foreground/48">
-                          {row.baseSku}
+                        <span className="rounded-full border border-border/70 bg-background px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-foreground/48" title="Base/Family SKU">
+                          {row.baseSku} (Base)
                         </span>
                       </div>
                       <p className="mt-1 text-xs text-foreground/52">
@@ -173,9 +178,31 @@ export function ProductTable({
                   <div className="space-y-1">
                     <p className="font-semibold text-foreground">{row.availableStock}</p>
                     <p className="text-xs text-foreground/52">
-                      {row.availableStock > 0 ? "Available" : "Awaiting stock"}
+                      Total Inv
                     </p>
                   </div>
+                </td>
+                <td className="border-b border-border/60 px-4 py-4 align-top">
+                  {(() => {
+                    // Aggregate quantities for all variants of this product that are in the cart
+                    const variantSkus = row.variants?.map((v: any) => v.sku) || [];
+                    const rowItems = items.filter(item => variantSkus.includes(item.sku));
+                    const totalSelected = rowItems.reduce((sum, item) => sum + (item.qty88 || 0) + (item.qty90 || 0), 0);
+                    
+                    if (totalSelected === 0) return <span className="text-xs text-foreground/20 italic">None</span>;
+                    
+                    return (
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-1.5 text-blue-500">
+                          <ShoppingCart className="h-3.5 w-3.5" />
+                          <span className="font-bold">{totalSelected}</span>
+                        </div>
+                        <p className="text-[10px] uppercase tracking-wider text-foreground/40 font-semibold">
+                          Across {rowItems.length} Variants
+                        </p>
+                      </div>
+                    );
+                  })()}
                 </td>
                 <td className="border-b border-border/60 px-4 py-4 align-top">
                   <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.14em] ${statusClasses(row.status)}`}>
