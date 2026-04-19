@@ -34,7 +34,6 @@ export function toNumber(value: unknown) {
 
 export function cleanText(value: unknown) {
   return String(value ?? "")
-    .replace(/_/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }

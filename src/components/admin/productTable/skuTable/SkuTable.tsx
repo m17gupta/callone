@@ -64,6 +64,7 @@ export function SkuTable({
   };
 
   const activeAttributes = currentAttribute?.attributes?.filter(attr => attr.show) || [];
+  console.log("activeAttributes",activeAttributes)
   const allData =
     currentAttribute?.name === "Travis Mathew"
       ? travismathew
@@ -181,7 +182,7 @@ export function SkuTable({
                             <div className="flex gap-4">
                               <div className="relative shrink-0">
                                 <ProductImage
-                                  brandName={currentAttribute?.name ?? ""}
+                                  brandName={currentAttribute?.name??""}
                                   rowData={row}
                                   alt={row.name}
                                   className="h-12 w-12 rounded-xl object-cover shadow-sm ring-1 ring-border/20 transition-transform hover:scale-105 cursor-pointer"
