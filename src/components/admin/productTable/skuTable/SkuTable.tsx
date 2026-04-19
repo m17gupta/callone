@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CartItem } from "@/store/slices/cart/cartSlice";
 import { ExtensionTable } from "./ExtensionTable";
 import { SkuQuantityInput } from "./SkuQuantityInput";
+import { AttributeField } from "@/store/slices/attributeSlice/attributeType";
 
 interface SkuTableProps {
   visibleRows: any[];
@@ -53,6 +54,38 @@ export function SkuTable({
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const {allWareHouse}= useSelector((state:RootState)=>state.warehouse)
 
+  const brandwareHouse: AttributeField[] = useMemo(() => {
+    const warehouseAttributes: AttributeField[] = [];
+    if (
+      currentAttribute?.name &&
+      allWareHouse.length &&
+      currentAttribute.attributes &&
+      currentAttribute.attributes.length
+    ) {
+      allWareHouse.forEach((item: any) => {
+        const warehouseCode = item.code?.toLowerCase();
+        const filterData = currentAttribute?.attributes?.find(
+          (attr: AttributeField) => {
+            const attrKey = attr.key?.toLowerCase();
+            return attrKey === warehouseCode || attrKey === `stock_${warehouseCode}`;
+          }
+        );
+        if (filterData) {
+          warehouseAttributes.push(filterData);
+        }
+      });
+    }
+    return warehouseAttributes;
+  }, [allWareHouse, currentAttribute]);
+  
+  const brandWareHouseKeys = useMemo(() => brandwareHouse.map(wh => wh.key), [brandwareHouse]);
+
+  const activeAttributes = currentAttribute?.attributes?.filter(attr => 
+    attr.show && !brandWareHouseKeys.includes(attr.key)
+  ) || [];
+
+  const displayAttributes = useMemo(() => [...activeAttributes, ...brandwareHouse], [activeAttributes, brandwareHouse]);
+
   const toggleRow = (id: string) => {
     const newExpandedRows = new Set(expandedRows);
     if (newExpandedRows.has(id)) {
@@ -62,9 +95,6 @@ export function SkuTable({
     }
     setExpandedRows(newExpandedRows);
   };
-
-  const activeAttributes = currentAttribute?.attributes?.filter(attr => attr.show) || [];
-  console.log("activeAttributes",activeAttributes)
   const allData =
     currentAttribute?.name === "Travis Mathew"
       ? travismathew
@@ -103,8 +133,8 @@ export function SkuTable({
             />
           </StickyHeading>
           <StickyHeading className="w-14 px-6 py-5">{" "}</StickyHeading>
-          {activeAttributes.length > 0 ? (
-            activeAttributes.map((attr) => (
+          {displayAttributes.length > 0 ? (
+            displayAttributes.map((attr) => (
               <StickyHeading key={attr.key} className="min-w-[150px] px-6 py-5">
                 {attr.label}
               </StickyHeading>
@@ -172,8 +202,8 @@ export function SkuTable({
                       </button>
                     )}
                   </td>
-                  {activeAttributes.length > 0 ? (
-                    activeAttributes.map((attr) => {
+                  {displayAttributes.length > 0 ? (
+                    displayAttributes.map((attr) => {
                       const key = attr.key || "";
 
                       if (key === "sku") {
@@ -234,6 +264,8 @@ export function SkuTable({
                         );
                       }
 
+                      if (key === "status") {
+                        return (
                           <td key={key} className="px-6 py-5 align-top">
                             <span className={clsx(
                               "inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.14em]",
@@ -242,6 +274,8 @@ export function SkuTable({
                               {row.status}
                             </span>
                           </td>
+                        );
+                      }
 
                       if (key === "availableStock" || key === "stock" || key === "variantStock") {
                         return (
@@ -256,6 +290,25 @@ export function SkuTable({
                         );
                       }
 
+                      const isWarehouse = brandWareHouseKeys.includes(key);
+
+                      if (isWarehouse) {
+                        const warehouseCode = key.toLowerCase().replace("stock_", "");
+                        const qtyKey = `qty${warehouseCode}`;
+                        const stockKey = key; // Using the attribute key itself
+
+                        return (
+                          <td key={key} className="border-b border-border/60 px-4 py-4 align-top">
+                            <SkuQuantityInput
+                              row={row}
+                              qty={qtyKey}
+                              value={items?.find(item => item?.sku === row.sku)?.[qtyKey] || 0}
+                              maxStock={Number(row[stockKey]) || 0}
+                            />
+                          </td>
+                        );
+                      }
+
                       // For any other attribute, match with object key
                       const attributeGroup = row.attributeGroups?.find((g: any) => g.key === key);
                       let val = row[key] !== undefined && row[key] !== null ? row[key] : (attributeGroup ? attributeGroup.values?.join(", ") : null);
@@ -263,62 +316,6 @@ export function SkuTable({
                       // If it's a stock field and value is null/undefined or empty string, set to 0
                       if ((key.toLowerCase().includes("stock") || key.toLowerCase().startsWith("stock_")) && (val === null || val === undefined || val === "")) {
                         val = 0;
-                      }
-
-                      if (key.toLowerCase() === "stock_88") {
-                        return (
-                          <td key={key} className="border-b border-border/60 px-4 py-4 align-top">
-                            <SkuQuantityInput
-                              row={row}
-                              qty={"qty88"}
-                              value={items.find(item => item.sku === row.sku)?.qty88 || 0}
-                              maxStock={Number(row.stock_88) || 0}
-                            // onChange={(val) => {
-                            //   setSkuQuantities(prev => ({
-                            //     ...prev,
-                            //     [rowId]: { 
-                            //       ...prev[rowId], 
-                            //       qty88: val,
-                            //       // Ensure other fields are initialized if this is the first update
-                            //       primaryImage: row?.primary_image_url??"",
-                            //       sku: row.sku || row.baseSku,
-                            //       description: row.description,
-                            //       amount: Number(row.amount) || 0,
-                            //       gst: Number(row.gst) || 0,
-                            //       mrp: Number(row.mrp) || 0,
-                            //     }
-                            //   }));
-                            // }}
-                            />
-                          </td>
-                        );
-                      }
-
-                      if (key.toLowerCase() === "stock_90") {
-                        return (
-                          <td key={key} className="border-b border-border/60 px-4 py-4 align-top">
-                            <SkuQuantityInput
-                              row={row}
-                              qty={"qty90"}
-                              value={items.find(item => item.sku === row.sku)?.qty90 || 0}
-                              maxStock={Number(row.stock_90) || 0}
-                            //   onChange={(val) => {
-                            //     setSkuQuantities(prev => ({
-                            //       ...prev,
-                            //       [rowId]: { 
-                            //         ...prev[rowId], 
-                            //         qty90: val,
-                            //         // Ensure other fields are initialized if this is the first update
-                            //         id: rowId,
-                            //         sku: row.sku || row.baseSku,
-                            //         mrp: Number(row.mrp) || 0,
-                            //       }
-                            //     }));
-                            //   }
-                            // }
-                            />
-                          </td>
-                        );
                       }
 
                       return (

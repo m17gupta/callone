@@ -122,8 +122,7 @@ export function CatalogHeader({
 }: CatalogHeaderProps) {
 const {currentAttribute} = useSelector((state:RootState) => state.attribute);
 
-console.log("categoryFilters",categoryFilters)
-console.log("appliedFilters",appliedFilters)
+
  const handleDownloadSample = async () => {
     if (!currentAttribute?.attributes) return;
 

@@ -18,7 +18,7 @@ export function ProductImage({ brandName, rowData, alt = "Product Image", classN
 
   const s3_url = `https://callaways3bucketcc001-prod.s3.ap-south-1.amazonaws.com/public/productimg/TRAVIS-Images`;
   const s3_url_ogio = `https://callaways3bucketcc001-prod.s3.ap-south-1.amazonaws.com/public/productimg/OGIO-Images`;
-   console.log("brandName", brandName , rowData?.sku)
+ 
   useEffect(() => {
     // Get the raw image source and filename
 
@@ -49,7 +49,7 @@ export function ProductImage({ brandName, rowData, alt = "Product Image", classN
   }, [brandName, rowData, s3_url, s3_url_ogio]);
 
   const displaySrc = primaryImage;
-   console.log("displaySrc",displaySrc)
+
 
   if (!displaySrc || error) {
     return (

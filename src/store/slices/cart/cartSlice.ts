@@ -24,6 +24,7 @@ export interface CartItem {
   netBilling?: number;
   finalAmount?: number;
   finalBillValue?: number;
+  [key: string]: any;
 }
 
 
